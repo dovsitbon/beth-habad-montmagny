@@ -8,6 +8,7 @@ import {
   WhatsappLogoIcon,
 } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
+import { photos } from "@/lib/community-photos";
 import { Todo } from "@/components/ui/todo";
 import { ContactForm } from "@/components/forms/contact-form";
 import { getSettings } from "@/lib/data/settings";
@@ -32,7 +33,7 @@ export default async function ContactPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Nous écrire, nous rendre visite" title="Contact">
+      <PageHeader image={photos.synagogue.src} eyebrow="Nous écrire, nous rendre visite" title="Contact">
         <p>Une question, une demande, une envie de passer ? Le Beth Habad vous répond avec plaisir.</p>
       </PageHeader>
 

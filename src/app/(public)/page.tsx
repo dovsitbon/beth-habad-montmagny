@@ -12,6 +12,10 @@ import { DonateButton } from "@/components/layout/donate-button";
 import { ShabbatCard } from "@/components/shabbat/shabbat-card";
 import { EventListItem } from "@/components/events/event-list-item";
 import { RichText } from "@/components/ui/rich-text";
+import { HeroBackground } from "@/components/home/hero-background";
+import { CommunityMosaic } from "@/components/home/community-mosaic";
+import { ParallaxBand } from "@/components/home/parallax-band";
+import { photos } from "@/lib/community-photos";
 import { getCalendar } from "@/lib/hebcal";
 import { getPage, getUpcomingEvents } from "@/lib/data/content";
 import { getSettings } from "@/lib/data/settings";
@@ -42,19 +46,20 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-night text-white">
+      <section className="relative isolate overflow-hidden bg-night text-white">
+        <HeroBackground image={photos.foule.src} />
         <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gold" />
         <div className="mx-auto max-w-6xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-24">
           <p className="text-sm font-semibold tracking-[0.18em] text-gold-soft uppercase">
             Centre communautaire · {siteConfig.address.region}
           </p>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold text-white sm:text-6xl">{settings.shortName}</h1>
-          {intro?.body && <RichText html={intro.body} className="mt-6 max-w-2xl text-lg text-white/85" />}
+          {intro?.body && <RichText html={intro.body} className="mt-6 max-w-2xl text-lg text-white" />}
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <DonateButton size="lg" />
             <Link
               href="/horaires"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-md border border-white/30 px-7 text-lg font-semibold text-white transition-colors hover:bg-white/10"
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-md border border-white/40 bg-night-deep/40 px-7 text-lg font-semibold text-white transition-colors hover:bg-white/10"
             >
               Horaires de Chabbat
               <ArrowRightIcon aria-hidden weight="bold" className="size-5" />
@@ -96,7 +101,14 @@ export default async function HomePage() {
           </Link>
         </section>
 
-        <nav aria-label="Accès rapides" className="lg:col-span-5">
+      </div>
+
+      <CommunityMosaic />
+
+      <ParallaxBand />
+
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+        <nav aria-label="Accès rapides">
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {shortcuts.map(({ href, label, Icon }) => (
               <li key={href}>

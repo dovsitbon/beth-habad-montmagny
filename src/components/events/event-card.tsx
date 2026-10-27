@@ -4,6 +4,7 @@ import { ClockIcon, MapPinIcon, TicketIcon } from "@phosphor-icons/react/ssr";
 import type { EventRow } from "@/lib/data/content";
 import { formatTime, mediaUrl } from "@/lib/format";
 import { siteConfig } from "@/config/site.config";
+import { photos } from "@/lib/community-photos";
 
 function dateParts(iso: string) {
   const f = (opts: Intl.DateTimeFormatOptions) =>
@@ -11,7 +12,7 @@ function dateParts(iso: string) {
   return { day: f({ day: "numeric" }), month: f({ month: "short" }), weekday: f({ weekday: "long" }) };
 }
 
-/** Carte d'événement pour l'agenda (photo facultative, pavé date, infos pratiques). */
+/** Carte d'événement pour l'agenda (photo, pavé date, infos pratiques). */
 export function EventCard({
   event,
   past = false,
@@ -26,17 +27,17 @@ export function EventCard({
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface transition-colors hover:border-gold">
-      {event.image_path && (
-        <div className="relative aspect-[16/9] bg-night-tint">
-          <Image
-            src={mediaUrl(event.image_path)}
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className={`object-cover ${past ? "grayscale-[40%]" : ""}`}
-          />
-        </div>
-      )}
+      {/* Sans photo propre, l'événement reprend une photo de la communauté. */}
+      <div className="relative aspect-[16/9] bg-night-tint">
+        <Image
+          src={event.image_path ? mediaUrl(event.image_path) : photos.popcorn.src}
+          alt=""
+          fill
+          placeholder={event.image_path ? "empty" : "blur"}
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className={`object-cover ${past ? "grayscale-[40%]" : ""}`}
+        />
+      </div>
       <div className="flex flex-1 gap-4 p-5">
         <span
           aria-hidden

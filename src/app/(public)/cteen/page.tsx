@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { areaLabel } from "@/config/site.config";
 import { PageHeader } from "@/components/ui/page-header";
+import { photos } from "@/lib/community-photos";
 import { RichText } from "@/components/ui/rich-text";
 import { EventGrid } from "@/components/events/event-grid";
 import { getPage, getPastEvents, getUpcomingEvents } from "@/lib/data/content";
@@ -20,7 +21,7 @@ export default async function CteenPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Jeunesse" title="CTeen">
+      <PageHeader image={photos.cteen.src} eyebrow="Jeunesse" title="CTeen">
         <p>Le réseau des ados du Beth Habad : soirées, sorties, projets et bonne humeur.</p>
       </PageHeader>
 

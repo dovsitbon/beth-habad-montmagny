@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/config/site.config";
 import { ArrowSquareOutIcon, HandHeartIcon, ShieldCheckIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
+import { photos } from "@/lib/community-photos";
 import { RichText } from "@/components/ui/rich-text";
 import { Todo } from "@/components/ui/todo";
 import { getPage } from "@/lib/data/content";
@@ -18,7 +19,7 @@ export default async function DonPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Tsédaka" title="Faire un don">
+      <PageHeader image={photos.cadeaux.src} eyebrow="Tsédaka" title="Faire un don">
         <p>Votre soutien fait vivre les activités du Beth Habad, tout au long de l&apos;année.</p>
       </PageHeader>
 

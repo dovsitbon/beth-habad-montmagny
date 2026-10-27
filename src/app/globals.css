@@ -136,3 +136,76 @@ html {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Photos de l'accueil ─────────────────────────────────────────────── */
+
+/* Mosaïque : la légende apparaît au survol sur ordinateur ; toujours visible au doigt. */
+.mosaic-tile img {
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@media (hover: hover) {
+  .mosaic-caption {
+    opacity: 0;
+    translate: 0 0.5rem;
+    transition:
+      opacity 0.3s ease,
+      translate 0.3s ease;
+  }
+  .mosaic-tile:hover .mosaic-caption {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .mosaic-tile:hover img {
+    transform: scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Bannière d'accueil sans vidéo : zoom lent sur la photo (Ken Burns). */
+  .ken-burns {
+    animation: ken-burns 24s ease-in-out infinite alternate;
+  }
+
+  /* Effets liés au défilement, sans JavaScript ; ignorés par les navigateurs qui ne les gèrent pas. */
+  @supports (animation-timeline: view()) {
+    /* Apparition douce des photos (fondu + léger glissement). */
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    /* Parallaxe du bandeau, sur tablette et ordinateur seulement. */
+    @media (min-width: 768px) {
+      .parallax {
+        animation: parallax linear both;
+        animation-timeline: view();
+      }
+    }
+  }
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1) translate(-1%, -1%);
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+}
+@keyframes parallax {
+  from {
+    translate: 0 -12%;
+  }
+  to {
+    translate: 0 12%;
+  }
+}

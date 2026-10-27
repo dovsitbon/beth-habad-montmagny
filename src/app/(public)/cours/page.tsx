@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/config/site.config";
 import { ClockIcon, MapPinIcon, UserIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
+import { photos } from "@/lib/community-photos";
 import { RichText } from "@/components/ui/rich-text";
 import { getCourses, getPage, type Course } from "@/lib/data/content";
 import { formatTime } from "@/lib/format";
@@ -44,7 +45,7 @@ export default async function CoursPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Étudier ensemble" title="Cours et activités">
+      <PageHeader image={photos.conference.src} eyebrow="Étudier ensemble" title="Cours et activités">
         <p>Cours de Torah et activités régulières, pour tous les âges.</p>
       </PageHeader>
 

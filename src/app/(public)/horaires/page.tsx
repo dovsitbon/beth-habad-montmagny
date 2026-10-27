@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/config/site.config";
 import { WarningCircleIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
+import { photos } from "@/lib/community-photos";
 import { ShabbatCard } from "@/components/shabbat/shabbat-card";
 import { TimeValue } from "@/components/shabbat/time-value";
 import { getCalendar, type HolidayDay } from "@/lib/hebcal";
@@ -42,7 +43,7 @@ export default async function HorairesPage() {
 
   return (
     <>
-      <PageHeader eyebrow={settings.address.city ?? undefined} title="Horaires de Chabbat et des fêtes">
+      <PageHeader image={photos.allumage.src} eyebrow={settings.address.city ?? undefined} title="Horaires de Chabbat et des fêtes">
         {calendar && today && (
           <p>
             Aujourd&apos;hui, {formatDayLong(calendar.today, true)}

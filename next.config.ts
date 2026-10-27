@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   images: {
     // Photos stockées dans Supabase Storage (bucket public « media »).
     remotePatterns: [{ protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" }],
+    // 60 : photos de fond sous un voile bleu (bannières), où la finesse ne se voit pas.
+    qualities: [60, 75],
   },
   cacheLife: {
     // Réponses de l'API Hebcal : rafraîchies toutes les 12 h.

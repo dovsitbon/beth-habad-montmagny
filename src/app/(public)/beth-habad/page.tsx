@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { areaProse, siteConfig } from "@/config/site.config";
 import Image from "next/image";
-import { UserIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
 import { RichText } from "@/components/ui/rich-text";
-import { Todo } from "@/components/ui/todo";
 import { getPage } from "@/lib/data/content";
 import { getSettings } from "@/lib/data/settings";
 import { mediaUrl } from "@/lib/format";
+import { photos } from "@/lib/community-photos";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/beth-habad" },
@@ -45,10 +44,15 @@ export default async function BethHabadPage() {
             {rabbin?.image_path ? (
               <Image src={mediaUrl(rabbin.image_path)} alt={rabbin.title} fill sizes="256px" className="object-cover" />
             ) : (
-              <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center">
-                <UserIcon aria-hidden className="size-14 text-night/30" />
-                <Todo>photo du rabbin</Todo>
-              </div>
+              // Tant qu'aucun portrait n'est ajouté depuis l'admin : le rabbin lors de la fête de Hanoucca.
+              <Image
+                src={photos.rabbin.src}
+                alt={photos.rabbin.alt}
+                fill
+                placeholder="blur"
+                sizes="256px"
+                className="object-cover object-[75%_center]"
+              />
             )}
           </div>
           <div>

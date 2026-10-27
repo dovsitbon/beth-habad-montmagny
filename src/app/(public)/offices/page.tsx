@@ -3,6 +3,7 @@ import { siteConfig } from "@/config/site.config";
 import Link from "next/link";
 import { ArrowRightIcon, InfoIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
+import { photos } from "@/lib/community-photos";
 import { getServiceTimes, type ServiceTime } from "@/lib/data/content";
 import { getSettings } from "@/lib/data/settings";
 import { formatTime, timeAttr } from "@/lib/format";
@@ -45,7 +46,7 @@ export default async function OfficesPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Synagogue" title="Horaires des offices">
+      <PageHeader image={photos.tefillin.src} eyebrow="Synagogue" title="Horaires des offices">
         <p>Chaharit, Minha et Arvit au {settings.shortName}.</p>
       </PageHeader>
 

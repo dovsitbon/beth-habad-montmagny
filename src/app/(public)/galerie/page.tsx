@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ImagesIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
+import { photos } from "@/lib/community-photos";
 import { getAlbums } from "@/lib/data/content";
 import { formatDayLong, mediaUrl } from "@/lib/format";
 
@@ -18,7 +19,7 @@ export default async function GaleriePage() {
 
   return (
     <>
-      <PageHeader eyebrow="Souvenirs" title="Galerie photos">
+      <PageHeader image={photos.repas.src} eyebrow="Souvenirs" title="Galerie photos">
         <p>Les moments partagés au Beth Habad, album par album.</p>
       </PageHeader>
 
