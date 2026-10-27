@@ -36,6 +36,8 @@ export type HolidayDay = {
 
 export type HebcalCalendar = {
   today: string;
+  /** Instant du calcul (ms) : l'accueil s'en sert pour son premier affichage, avant de suivre l'heure réelle. */
+  computedAt: number;
   /** Le Chabbat de la semaine (ou la fête qui l'englobe), jusqu'à sa Fin. */
   current: Occasion | null;
   /** La prochaine fête dans les 60 jours, si ce n'est pas déjà `current`. */
@@ -139,8 +141,9 @@ export async function getCalendar(): Promise<HebcalCalendar | null> {
 
   const today = todayISO();
   const now = Date.now();
+  // Gardées jusqu'à la fin de leur affichage sur l'accueil (Arvit de la sortie + 30 min).
   const occasions = occasionsFrom(items, settings, weeks, addDays(today, -7), addDays(today, 365)).filter(
-    (o) => o.end > now,
+    (o) => o.homeUntil > now,
   );
   const current = occasions.find((o) => o.days.some((d) => new Date(`${d}T12:00:00Z`).getUTCDay() === 6)) ?? null;
   const nextHoliday =
@@ -191,5 +194,5 @@ export async function getCalendar(): Promise<HebcalCalendar | null> {
     });
   }
 
-  return { today, current, nextHoliday, occasions, holidays };
+  return { today, computedAt: now, current, nextHoliday, occasions, holidays };
 }

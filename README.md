@@ -152,7 +152,8 @@ Sans configuration, Supabase n'envoie les e-mails de connexion **qu'aux membres 
 
 ```bash
 npm run lint
-npm run test:horaires  # horaires au format du rabbin : son message du Chabbat Lekh Lekha au caractère près, fêtes, 60 parachiot
+npm run test:horaires  # horaires au format du rabbin (message du Chabbat Lekh Lekha au caractère près, fêtes, 60 parachiot) et bascule de l'accueil
+npm run test:accueil   # bascule Chabbat / semaine de l'accueil dans Edge, horloge avancée (E2E_BASE_URL pour le site en ligne)
 npm run test:rls       # 37 vérifications des règles de sécurité (visiteur, éditeur, serveur)
 npm run test:e2e       # 48 vérifications de l'admin dans Edge, format téléphone (serveur local requis)
 ```

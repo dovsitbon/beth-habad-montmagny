@@ -6,7 +6,7 @@ export const OFFICE_OPTIONS = [
 ];
 // Vendredi soir et Chabbat : calculés chaque semaine dans la page « Ce Chabbat ».
 export const DAY_OPTIONS = [
-  { value: "semaine", label: "En semaine" },
+  { value: "semaine", label: "Du lundi au vendredi" },
   { value: "dimanche", label: "Dimanche" },
   { value: "fete", label: "Jours de fête" },
 ];

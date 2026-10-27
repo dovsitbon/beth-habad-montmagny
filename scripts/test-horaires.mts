@@ -6,6 +6,7 @@
  */
 import {
   buildOccasions,
+  homeOccasionKey,
   toWhatsApp,
   type HebcalItem,
   type Occasion,
@@ -145,6 +146,18 @@ const souccot = occasionOf(tichri, "2026-09-25");
 check("titre « HORAIRES SOUCCOT »", toWhatsApp(souccot).startsWith("HORAIRES SOUCCOT\n"));
 const atseret = occasionOf(tichri, "2026-10-02");
 check("titre « HORAIRES CHEMINI ATSERET ET SIM'HAT TORAH »", toWhatsApp(atseret).startsWith("HORAIRES CHEMINI ATSERET ET SIM'HAT TORAH\n"));
+
+console.log("\nAccueil : Chabbat ou offices de la semaine selon l'heure de Paris");
+const windows = [occasionOf(octobre, "2026-10-23"), kippour];
+const mode = (parisIso: string) => homeOccasionKey(windows, Date.parse(parisIso)) ?? "Offices de la semaine";
+check("jeudi 22/10 à 22h → « Offices de la semaine »", mode("2026-10-22T22:00:00+02:00") === "Offices de la semaine");
+check("vendredi 23/10 à 0h → « Horaires Chabbat »", mode("2026-10-23T00:00:00+02:00") === "2026-10-23");
+check("vendredi 23/10 à 10h → « Horaires Chabbat »", mode("2026-10-23T10:00:00+02:00") === "2026-10-23");
+check("samedi 24/10 à 20h10 (Arvit 19h43 + 27 min) → toujours Chabbat", mode("2026-10-24T20:10:00+02:00") === "2026-10-23");
+check("samedi 24/10 à 20h13 (Arvit + 30 min) → « Offices de la semaine »", mode("2026-10-24T20:13:00+02:00") === "Offices de la semaine");
+check("samedi 24/10 à 23h → « Offices de la semaine »", mode("2026-10-24T23:00:00+02:00") === "Offices de la semaine");
+check("fête en semaine : dimanche 20/09 (veille de Kippour) à 10h → Kippour", mode("2026-09-20T10:00:00+02:00") === "2026-09-20");
+check("lundi 21/09 à 23h, après Kippour → « Offices de la semaine »", mode("2026-09-21T23:00:00+02:00") === "Offices de la semaine");
 
 // ---------------------------------------------------------------------------
 console.log("\nParachiot");

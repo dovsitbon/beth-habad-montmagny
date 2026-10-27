@@ -105,7 +105,16 @@ export type Occasion = {
   /** Allumage de la veille et Fin du dernier jour (ms UTC, ajustements compris). */
   start: number;
   end: number;
+  /**
+   * Période où l'accueil affiche ces horaires en grand (ms UTC) : de la veille à 0 h
+   * jusqu'à l'Arvit de la sortie (Chabbat ou fête) + 30 min.
+   */
+  homeFrom: number;
+  homeUntil: number;
 };
+
+/** Minutes après l'Arvit de la sortie pendant lesquelles l'accueil garde les horaires de Chabbat. */
+export const HOME_MINUTES_AFTER_ARVIT = 30;
 
 // ---------------------------------------------------------------------------
 // Dates et heures locales
@@ -337,6 +346,8 @@ function buildOccasion(days: string[], yomtov: Set<string>, input: BuildInput): 
   }
 
   const lastDay = days.at(-1)!;
+  const finalArvit = sections.flatMap((s) => s.lines).find((l) => l.id === `${lastDay}:arvit`);
+  const arvitMinutes = finalArvit?.minutes ?? (finLine?.minutes ?? endOf(lastDay)) + rules.arvitAfterEnd;
   return {
     key: eve,
     kind: isFete ? "fete" : "chabbat",
@@ -353,7 +364,17 @@ function buildOccasion(days: string[], yomtov: Set<string>, input: BuildInput): 
     computedClosing,
     start: localToMs(eve, allumage.minutes ?? 0, timeZone),
     end: localToMs(lastDay, finLine?.minutes ?? endOf(lastDay), timeZone),
+    homeFrom: localToMs(eve, 0, timeZone),
+    homeUntil: localToMs(lastDay, arvitMinutes + HOME_MINUTES_AFTER_ARVIT, timeZone),
   };
+}
+
+/**
+ * Ce que l'accueil affiche à l'instant `now` : la clé de l'occasion (Chabbat ou fête) dont
+ * c'est la période, ou null pour « Offices de la semaine ».
+ */
+export function homeOccasionKey(windows: { key: string; homeFrom: number; homeUntil: number }[], now: number): string | null {
+  return windows.find((w) => now >= w.homeFrom && now < w.homeUntil)?.key ?? null;
 }
 
 // ---------------------------------------------------------------------------

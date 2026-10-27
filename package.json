@@ -10,7 +10,8 @@
     "test:rls": "node scripts/test-rls.mjs",
     "db:types": "supabase gen types typescript --linked --schema public > src/lib/supabase/database.types.ts",
     "test:e2e": "node scripts/e2e-admin.mjs",
-    "test:horaires": "node --no-warnings scripts/test-horaires.mts"
+    "test:horaires": "node --no-warnings scripts/test-horaires.mts",
+    "test:accueil": "node scripts/test-accueil.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

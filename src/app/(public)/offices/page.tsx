@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 // Le vendredi soir et le Chabbat viennent du calcul de la semaine (bloc « Ce Chabbat »).
 const DAYS: { key: ServiceTime["day_type"]; label: string }[] = [
-  { key: "semaine", label: "En semaine" },
+  { key: "semaine", label: "Du lundi au vendredi" },
   { key: "dimanche", label: "Dimanche" },
   { key: "fete", label: "Jours de fête" },
 ];

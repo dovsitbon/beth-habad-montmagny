@@ -137,8 +137,8 @@ begin
      null, 'Beth Habad Montmagny · Groslay', '<p>Atelier d''exemple.</p>', 3, 'published');
 
   insert into public.service_times (office, day_type, time, note, sort_order) values
-    ('chaharit', 'semaine', '07:00', '[EXEMPLE] horaire à remplacer', 1),
-    ('chaharit', 'dimanche', '08:30', '[EXEMPLE] horaire à remplacer', 2),
+    ('chaharit', 'semaine', '08:15', null, 1),
+    ('chaharit', 'dimanche', '09:00', null, 2),
     ('arvit', 'semaine', '20:00', '[EXEMPLE] horaire à remplacer', 1);
 
   insert into public.announcements (message, level, is_active, expires_at)

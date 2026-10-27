@@ -10,14 +10,17 @@ import {
   UsersThreeIcon,
 } from "@phosphor-icons/react/ssr";
 import { DonateButton } from "@/components/layout/donate-button";
-import { ShabbatCard } from "@/components/shabbat/shabbat-card";
+import { ScheduleBlock } from "@/components/shabbat/schedule-block";
+import { HomeSchedule } from "@/components/home/home-schedule";
 import { EventListItem } from "@/components/events/event-list-item";
 import { RichText } from "@/components/ui/rich-text";
 import { CommunityMosaic } from "@/components/home/community-mosaic";
 import { ParallaxBand } from "@/components/home/parallax-band";
 import { photos } from "@/lib/community-photos";
 import { getCalendar } from "@/lib/hebcal";
-import { getPage, getUpcomingEvents } from "@/lib/data/content";
+import { getPage, getServiceTimes, getUpcomingEvents } from "@/lib/data/content";
+import { formatDayLong, hebrewDate } from "@/lib/format";
+import type { Occasion } from "@/lib/horaires/calcul";
 import { getSettings } from "@/lib/data/settings";
 
 const shortcuts = [
@@ -37,12 +40,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [settings, intro, calendar, events] = await Promise.all([
+  const [settings, intro, calendar, events, serviceTimes] = await Promise.all([
     getSettings(),
     getPage("accueil"),
     getCalendar(),
     getUpcomingEvents(4),
+    getServiceTimes(),
   ]);
+  // Les prochains Chabbatot / fêtes : le bloc affiché est choisi selon l'heure de Paris (HomeSchedule).
+  const upcoming = calendar?.occasions.slice(0, 3) ?? [];
 
   return (
     <>
@@ -83,18 +89,24 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-5">
-        <div className="lg:col-span-2">
-          <ShabbatCard occasion={calendar?.current ?? null} />
-        </div>
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-12 sm:px-6 sm:py-16">
+        <HomeSchedule
+          windows={upcoming.map((o) => ({ key: o.key, homeFrom: o.homeFrom, homeUntil: o.homeUntil }))}
+          computedAt={calendar?.computedAt ?? 0}
+          timeZone={siteConfig.timeZone}
+          occasionBlocks={Object.fromEntries(upcoming.map((o) => [o.key, <OccasionHero key={o.key} occasion={o} />]))}
+          offices={serviceTimes
+            .filter((t) => t.day_type === "semaine" || t.day_type === "dimanche")
+            .map((t) => ({ id: t.id, office: t.office, day_type: t.day_type, time: t.time, note: t.note }))}
+        />
 
-        <section aria-labelledby="evenements-titre" className="rounded-xl border border-line bg-surface p-6 sm:p-8 lg:col-span-3">
+        <section aria-labelledby="evenements-titre" className="rounded-xl border border-line bg-surface p-6 sm:p-8">
           <p className="text-sm font-semibold tracking-[0.14em] text-gold-ink uppercase">Agenda</p>
           <h2 id="evenements-titre" className="mt-2 text-3xl text-night">
             Prochains événements
           </h2>
           {events.length > 0 ? (
-            <ul className="-mx-3 mt-5 space-y-1">
+            <ul className="-mx-3 mt-5 space-y-1 lg:grid lg:grid-cols-2 lg:gap-x-6 lg:space-y-0">
               {events.map((event) => (
                 <li key={event.id}>
                   <EventListItem event={event} />
@@ -140,5 +152,36 @@ export default async function HomePage() {
         </nav>
       </div>
     </>
+  );
+}
+
+/** Horaires de Chabbat (ou de la fête) en grand : le bloc principal de l'accueil pendant Chabbat. */
+function OccasionHero({ occasion }: { occasion: Occasion }) {
+  const day = occasion.days.find((d) => new Date(`${d}T12:00:00Z`).getUTCDay() === 6) ?? occasion.days[0];
+  return (
+    <section aria-labelledby={`horaires-${occasion.key}`} className="rounded-2xl border-2 border-gold bg-surface p-6 shadow-sm sm:p-10">
+      <p className="text-sm font-semibold tracking-[0.14em] text-gold-ink uppercase">
+        {occasion.kind === "chabbat" ? "Ce Chabbat" : "Cette fête"} · <span className="normal-case">{formatDayLong(day)}</span> ·{" "}
+        <span className="normal-case">{hebrewDate(day).fr}</span>
+      </p>
+      <h2
+        id={`horaires-${occasion.key}`}
+        className="mt-3 font-serif text-3xl font-semibold tracking-[0.04em] text-night uppercase sm:text-4xl"
+      >
+        {occasion.title}
+        {occasion.parashaHebrew && (
+          <span lang="he" dir="rtl" className="ml-3 align-middle text-xl font-normal tracking-normal text-ink-muted normal-case">
+            {occasion.parashaHebrew}
+          </span>
+        )}
+      </h2>
+      <ScheduleBlock occasion={occasion} size="large" showTitle={false} />
+      <p className="mt-6 text-center">
+        <Link href="/horaires" className="inline-flex min-h-11 items-center gap-2 font-semibold text-night underline decoration-gold decoration-2 underline-offset-4">
+          Tous les horaires de Chabbat et des fêtes
+          <ArrowRightIcon aria-hidden weight="bold" className="size-4" />
+        </Link>
+      </p>
+    </section>
   );
 }
