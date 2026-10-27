@@ -13,16 +13,14 @@ export const metadata = { title: "Modifier un texte" };
 /** Adresse publique où le texte est visible. */
 const PUBLIC_URL: Record<string, string> = {
   accueil: "/",
-  "beth-habad": "/beth-habad",
-  rabbin: "/beth-habad",
   cteen: "/cteen",
   cours: "/cours",
   "faire-un-don": "/faire-un-don",
   "mentions-legales": "/mentions-legales",
   confidentialite: "/confidentialite",
 };
-/** Textes accompagnés d'une photo. */
-const WITH_IMAGE = new Set(["beth-habad", "rabbin"]);
+/** Textes accompagnés d'une photo (aucun depuis le retrait de la page « Le Beth Habad »). */
+const WITH_IMAGE = new Set<string>();
 
 export default async function EditPageText({ params }: PageProps<"/admin/textes/[slug]">) {
   await requireMember();

@@ -29,7 +29,6 @@ export async function GET() {
     `- [Événements](${base}/evenements) : agenda et inscriptions`,
     `- [Cours et activités](${base}/cours)`,
     `- [CTeen](${base}/cteen) : activités pour les adolescents`,
-    `- [Le Beth Habad et le Rabbin](${base}/beth-habad)`,
     `- [Faire un don](${base}/faire-un-don)`,
     `- [Contact et accès](${base}/contact)`,
     events.length ? "" : null,

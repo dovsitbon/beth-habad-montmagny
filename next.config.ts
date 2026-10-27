@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
       expire: 60 * 60 * 48,
     },
   },
+  async redirects() {
+    // Ancienne page « Le Beth Habad », supprimée : les liens déjà partagés ou indexés mènent à l'accueil.
+    return [{ source: "/beth-habad", destination: "/", permanent: true }];
+  },
   turbopack: {
     rules: {
       "*.css": {
