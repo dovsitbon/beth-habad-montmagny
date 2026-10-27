@@ -74,7 +74,6 @@ export const mainNav = [
   { href: "/cteen", label: "CTeen" },
   { href: "/cours", label: "Cours" },
   { href: "/galerie", label: "Galerie" },
-  { href: "/beth-habad", label: "Le Beth Habad" },
   { href: "https://beth-habad-montmagny.fr/", label: "Mikvé" },
   { href: "/contact", label: "Contact" },
 ] as const;
