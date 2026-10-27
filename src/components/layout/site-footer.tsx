@@ -84,9 +84,21 @@ export async function SiteFooter() {
           <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 md:grid-cols-1">
             {mainNav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
-                  {item.label}
-                </Link>
+                {/^https?:\/\//.test(item.href) ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener"
+                    className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline"
+                  >
+                    {item.label}
+                    <span className="sr-only"> (ouvre un autre site dans un nouvel onglet)</span>
+                  </a>
+                ) : (
+                  <Link href={item.href} className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
+                    {item.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

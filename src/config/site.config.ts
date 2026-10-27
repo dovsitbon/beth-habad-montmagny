@@ -66,7 +66,7 @@ export const siteConfig = {
 
 export type SiteConfig = typeof siteConfig;
 
-/** Liens de navigation principaux (ordre d'affichage). */
+/** Liens de navigation principaux (ordre d'affichage). Un lien en https:// s'ouvre dans un nouvel onglet. */
 export const mainNav = [
   { href: "/horaires", label: "Chabbat & fêtes" },
   { href: "/offices", label: "Offices" },
@@ -75,6 +75,7 @@ export const mainNav = [
   { href: "/cours", label: "Cours" },
   { href: "/galerie", label: "Galerie" },
   { href: "/beth-habad", label: "Le Beth Habad" },
+  { href: "https://beth-habad-montmagny.fr/", label: "Mikvé" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
