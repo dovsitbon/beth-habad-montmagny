@@ -134,10 +134,6 @@ export async function SiteFooter() {
                 Politique de confidentialité
               </Link>
             </li>
-            <li>
-              <Link href="/admin" className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
-                Espace de gestion
-              </Link>
             </li>
           </ul>
         </div>
