@@ -75,7 +75,7 @@ export default async function HomePage() {
             Centre communautaire · {siteConfig.address.region}
           </p>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold text-white sm:text-6xl">{settings.shortName}</h1>
-          {intro?.body && <RichText html={intro.body} className="mt-6 max-w-2xl text-lg text-white" />}
+          <RichText html={intro?.body || `<p>${siteConfig.intro}</p>`} className="mt-6 max-w-2xl text-lg text-white" />
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <DonateButton size="lg" />
             <Link

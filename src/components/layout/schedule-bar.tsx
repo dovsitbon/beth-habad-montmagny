@@ -1,0 +1,42 @@
+"use client";
+
+import Link from "next/link";
+import { ClockIcon } from "@phosphor-icons/react";
+import { bandeauAt, type Bandeau, type HomeWindow, type OfficeRow } from "@/lib/horaires/bandeau";
+import { useNowSnapshot } from "@/components/shabbat/use-now-snapshot";
+
+type Props = { windows: HomeWindow[]; offices: OfficeRow[]; computedAt: number; timeZone: string };
+
+/**
+ * Bandeau du haut quand aucune annonce n'est publiée : les offices du jour, ou les horaires
+ * de Chabbat du vendredi 8 h à la fin de Chabbat. Bascule dans le navigateur, à l'heure de Paris.
+ */
+export function ScheduleBar({ windows, offices, computedAt, timeZone }: Props) {
+  const state = useNowSnapshot((now) => JSON.stringify(bandeauAt(windows, offices, now, timeZone)), computedAt);
+  const bandeau = JSON.parse(state) as Bandeau | null;
+  if (!bandeau) return null;
+
+  const chabbat = bandeau.kind === "chabbat";
+  const [first, ...rest] = chabbat ? bandeau.parts : [bandeau.day, ...bandeau.parts];
+  return (
+    <section aria-label={chabbat ? "Horaires de Chabbat" : "Offices du jour"} className="border-b border-gold/40 bg-gold-tint text-ink">
+      <Link
+        href={chabbat ? "/horaires" : "/offices"}
+        className="mx-auto flex max-w-6xl items-start gap-2.5 px-4 py-2.5 text-[0.95rem] leading-snug hover:underline sm:items-center sm:px-6"
+      >
+        <ClockIcon aria-hidden weight="fill" className="mt-0.5 size-5 shrink-0 text-night sm:mt-0" />
+        <span className="line-clamp-2">
+          <strong className="font-semibold text-night">{first}</strong>
+          {rest.map((part) => (
+            <span key={part}>
+              <span aria-hidden className="mx-0.5 text-gold-ink">
+                {" · "}
+              </span>
+              <span className="whitespace-nowrap">{part}</span>
+            </span>
+          ))}
+        </span>
+      </Link>
+    </section>
+  );
+}

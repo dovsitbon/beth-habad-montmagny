@@ -14,6 +14,7 @@ import {
   type WeekAdjustments,
 } from "../src/lib/horaires/calcul.ts";
 import { parashaFr } from "../src/lib/horaires/noms.ts";
+import { bandeauAt, toHomeWindow, type OfficeRow } from "../src/lib/horaires/bandeau.ts";
 
 const place = { latitude: 48.976809, longitude: 2.346422 };
 const timeZone = "Europe/Paris";
@@ -151,13 +152,36 @@ console.log("\nAccueil : Chabbat ou offices de la semaine selon l'heure de Paris
 const windows = [occasionOf(octobre, "2026-10-23"), kippour];
 const mode = (parisIso: string) => homeOccasionKey(windows, Date.parse(parisIso)) ?? "Offices de la semaine";
 check("jeudi 22/10 à 22h → « Offices de la semaine »", mode("2026-10-22T22:00:00+02:00") === "Offices de la semaine");
-check("vendredi 23/10 à 0h → « Horaires Chabbat »", mode("2026-10-23T00:00:00+02:00") === "2026-10-23");
+check("vendredi 23/10 à 7h59 → encore « Offices de la semaine »", mode("2026-10-23T07:59:00+02:00") === "Offices de la semaine");
+check("vendredi 23/10 à 8h → « Horaires Chabbat »", mode("2026-10-23T08:00:00+02:00") === "2026-10-23");
 check("vendredi 23/10 à 10h → « Horaires Chabbat »", mode("2026-10-23T10:00:00+02:00") === "2026-10-23");
 check("samedi 24/10 à 20h10 (Arvit 19h43 + 27 min) → toujours Chabbat", mode("2026-10-24T20:10:00+02:00") === "2026-10-23");
 check("samedi 24/10 à 20h13 (Arvit + 30 min) → « Offices de la semaine »", mode("2026-10-24T20:13:00+02:00") === "Offices de la semaine");
 check("samedi 24/10 à 23h → « Offices de la semaine »", mode("2026-10-24T23:00:00+02:00") === "Offices de la semaine");
 check("fête en semaine : dimanche 20/09 (veille de Kippour) à 10h → Kippour", mode("2026-09-20T10:00:00+02:00") === "2026-09-20");
 check("lundi 21/09 à 23h, après Kippour → « Offices de la semaine »", mode("2026-09-21T23:00:00+02:00") === "Offices de la semaine");
+
+console.log("\nBandeau du haut");
+const offices: OfficeRow[] = [
+  { office: "chaharit", day_type: "semaine", time: "08:15:00" },
+  { office: "minha", day_type: "semaine", time: "18:30:00" },
+  { office: "arvit", day_type: "semaine", time: "18:45:00" },
+  { office: "chaharit", day_type: "dimanche", time: "09:00:00" },
+];
+const bandeauWindows = [toHomeWindow(occasionOf(octobre, "2026-10-23"))];
+const bandeau = (parisIso: string) => {
+  const b = bandeauAt(bandeauWindows, offices, Date.parse(parisIso), timeZone);
+  return b ? (b.kind === "chabbat" ? b.parts : [b.day, ...b.parts]).join(" · ") : "";
+};
+check("jeudi 22/10 à 20h → offices du jour", bandeau("2026-10-22T20:00:00+02:00") === "Aujourd'hui · Chaharit 8h15 · Minha 18h30 · Arvit 18h45");
+check("vendredi 23/10 à 7h59 → encore les offices du jour", bandeau("2026-10-23T07:59:00+02:00").startsWith("Aujourd'hui · Chaharit 8h15"));
+check(
+  "vendredi 23/10 à 9h → « Chabbat Lekh Lekha · Allumage avant 18h28 · Chaharit 9h15 · Fin 19h33 »",
+  bandeau("2026-10-23T09:00:00+02:00") === "Chabbat Lekh Lekha · Allumage avant 18h28 · Chaharit 9h15 · Fin 19h33",
+);
+check("samedi 24/10 à 20h → toujours Chabbat (Arvit 19h43 + 30 min)", bandeau("2026-10-24T20:00:00+02:00").startsWith("Chabbat Lekh Lekha"));
+check("samedi 24/10 à 23h → offices du jour (ceux de demain dimanche)", bandeau("2026-10-24T23:00:00+02:00") === "Demain · Chaharit 9h");
+check("dimanche 25/10 à 10h → Chaharit 9h", bandeau("2026-10-25T10:00:00+01:00") === "Aujourd'hui · Chaharit 9h");
 
 // ---------------------------------------------------------------------------
 console.log("\nParachiot");

@@ -12,6 +12,7 @@ import { photos } from "@/lib/community-photos";
 import { Todo } from "@/components/ui/todo";
 import { ContactForm } from "@/components/forms/contact-form";
 import { getSettings } from "@/lib/data/settings";
+import { telHref, whatsappHref } from "@/lib/format";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
@@ -57,7 +58,7 @@ export default async function ContactPage() {
               <p className="flex gap-3">
                 <PhoneIcon aria-hidden weight="bold" className="mt-1 size-5 shrink-0 text-gold-ink" />
                 {s.phone ? (
-                  <a href={`tel:${s.phone.replace(/[^+\d]/g, "")}`} className="font-semibold underline underline-offset-4">
+                  <a href={telHref(s.phone)} className="font-semibold underline underline-offset-4">
                     {s.phone}
                   </a>
                 ) : (
@@ -78,7 +79,7 @@ export default async function ContactPage() {
 
             {s.whatsapp ? (
               <a
-                href={`https://wa.me/${s.whatsapp.replace(/\D/g, "")}`}
+                href={whatsappHref(s.whatsapp)}
                 target="_blank"
                 rel="noopener"
                 className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#1F7A4D] px-5 font-bold text-white transition-colors hover:bg-[#186640]"

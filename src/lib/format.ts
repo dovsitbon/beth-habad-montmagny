@@ -147,3 +147,19 @@ export function stripHtml(html: string): string {
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
+
+/** « 06 12 83 38 48 » → « +33612833848 » (numéro français à 10 chiffres ; sinon chiffres et + seulement). */
+export function internationalPhone(phone: string): string {
+  const compact = phone.replace(/[^+\d]/g, "");
+  return /^0\d{9}$/.test(compact) ? `+33${compact.slice(1)}` : compact;
+}
+
+/** Lien d'appel : « tel:+33612833848 ». */
+export function telHref(phone: string): string {
+  return `tel:${internationalPhone(phone)}`;
+}
+
+/** Lien WhatsApp : « https://wa.me/33612833848 » (numéro international sans + ni espaces). */
+export function whatsappHref(number: string): string {
+  return `https://wa.me/${number.replace(/\D/g, "")}`;
+}

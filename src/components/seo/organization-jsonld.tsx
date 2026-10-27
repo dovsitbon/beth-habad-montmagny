@@ -1,6 +1,6 @@
 import { siteConfig } from "@/config/site.config";
 import { getSettings } from "@/lib/data/settings";
-import { mediaUrl } from "@/lib/format";
+import { internationalPhone, mediaUrl } from "@/lib/format";
 
 /**
  * Données structurées schema.org du Beth Habad (type Synagogue, sous-type de PlaceOfWorship) :
@@ -19,7 +19,7 @@ export async function OrganizationJsonLd() {
     description: s.tagline ?? siteConfig.description,
     url: siteConfig.url,
     ...(s.logoPath ? { logo: mediaUrl(s.logoPath), image: mediaUrl(s.logoPath) } : {}),
-    ...(s.phone ? { telephone: s.phone } : {}),
+    ...(s.phone ? { telephone: internationalPhone(s.phone) } : {}),
     ...(s.email ? { email: s.email } : {}),
     address: {
       "@type": "PostalAddress",

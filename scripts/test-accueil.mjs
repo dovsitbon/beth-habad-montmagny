@@ -54,8 +54,10 @@ async function homeAt(date) {
   await page.waitForTimeout(500);
   const text = await page.locator("main").innerText();
   const first = await page.locator("main section").nth(1).innerText();
+  const bar = page.locator('section[aria-label="Offices du jour"], section[aria-label="Horaires de Chabbat"]');
+  const banner = (await bar.count()) ? { label: await bar.getAttribute("aria-label"), text: (await bar.innerText()).replace(/\s+/g, " ").trim(), href: await bar.locator("a").getAttribute("href") } : null;
   await context.close();
-  return { text, first, errors };
+  return { text, first, banner, errors };
 }
 
 console.log(`\nAccueil (${BASE}) — semaine du ${thursday} au ${saturday}`);
@@ -65,6 +67,20 @@ check(`jeudi ${thursday} à 22h → « Offices de la semaine »`, jeudi.first.in
 check("jeudi : Chaharit 8h15 du lundi au vendredi, mis en évidence « Aujourd'hui »", /Du lundi au vendredi\s*Aujourd'hui[\s\S]*Chaharit\s*8h15/i.test(jeudi.first));
 check("jeudi : petit lien « Horaires de Chabbat »", jeudi.first.includes("Horaires de Chabbat"));
 
+const jeudiSoir = await homeAt(paris(thursday, "20:00"));
+check(`bandeau jeudi ${thursday} à 20h → offices du jour (« Aujourd'hui · Chaharit 8h15 … »)`, jeudiSoir.banner?.label === "Offices du jour" && /^Aujourd'hui · Chaharit 8h15/.test(jeudiSoir.banner.text));
+
+const vendrediMatin = await homeAt(paris(friday, "07:30"));
+check(`vendredi ${friday} à 7h30 → encore « Offices de la semaine » (bascule à 8h)`, vendrediMatin.first.includes("Offices de la semaine"));
+
+const vendrediBandeau = await homeAt(paris(friday, "09:00"));
+check(
+  `bandeau vendredi ${friday} à 9h → « Chabbat … · Allumage avant … · Chaharit 9h15 · Fin … », lien vers /horaires`,
+  vendrediBandeau.banner?.label === "Horaires de Chabbat" &&
+    /^Chabbat .+ · Allumage avant \d+h\d* · Chaharit 9h15 · Fin \d+h\d*$/.test(vendrediBandeau.banner.text) &&
+    vendrediBandeau.banner.href === "/horaires",
+);
+
 const vendredi = await homeAt(paris(friday, "10:00"));
 check(`vendredi ${friday} à 10h → « Horaires Chabbat » en grand`, /HORAIRES (CHABBAT|[A-Z' ]+)/.test(vendredi.first) && !vendredi.first.includes("Offices de la semaine"));
 check("vendredi : Allumage, Tania, Chaharit, Fin, Arvit et « Chabbat Chalom »", ["Allumage", "Tania", "Chaharit", "Fin", "Arvit", "Chabbat Chalom"].every((w) => vendredi.first.includes(w)));
@@ -72,6 +88,7 @@ check("vendredi : Allumage, Tania, Chaharit, Fin, Arvit et « Chabbat Chalom »"
 const samedi = await homeAt(paris(saturday, "23:00"));
 check(`samedi ${saturday} à 23h → « Offices de la semaine »`, samedi.first.includes("Offices de la semaine"));
 check("samedi soir : les offices de dimanche sont mis en avant (« Demain »)", /Dimanche\s*Demain[\s\S]*Chaharit\s*9h/i.test(samedi.first));
+check(`bandeau samedi ${saturday} à 23h → offices (« Demain · Chaharit 9h »)`, samedi.banner?.label === "Offices du jour" && samedi.banner.text.startsWith("Demain · Chaharit 9h"));
 
 // La page /horaires, elle, affiche les horaires de Chabbat toute la semaine.
 const context = await browser.newContext({ timezoneId: TZ });
@@ -81,7 +98,7 @@ await page.goto(`${BASE}/horaires`, { waitUntil: "networkidle" });
 check("/horaires montre les horaires de Chabbat même un jeudi", /HORAIRES CHABBAT/i.test(await page.locator("main").innerText()));
 await context.close();
 
-check("aucune erreur JavaScript", [jeudi, vendredi, samedi].every((r) => r.errors.length === 0));
+check("aucune erreur JavaScript", [jeudi, jeudiSoir, vendrediMatin, vendrediBandeau, vendredi, samedi].every((r) => r.errors.length === 0));
 await browser.close();
 
 console.log(failed === 0 ? "\nTous les tests passent." : `\n${failed} échec(s).`);

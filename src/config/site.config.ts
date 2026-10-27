@@ -23,6 +23,10 @@ export const siteConfig = {
   description:
     "Centre communautaire Beth Habad Montmagny · Groslay (Val-d'Oise) : horaires de Chabbat et des offices, événements, cours de Torah, CTeen et vie communautaire.",
 
+  /** Texte de présentation de la bannière d'accueil, si la page « accueil » est vide (modifiable dans l'admin, Textes). */
+  intro:
+    "Un lieu chaleureux et ouvert à tous, au cœur de Montmagny et Groslay. Offices chaque jour, Chabbat, fêtes, cours de Torah et activités pour les enfants et les jeunes : ici, chacun trouve sa place.",
+
   /** URL publique du site (sans / final). Remplacée par la variable d'environnement si elle existe. */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 
@@ -45,11 +49,11 @@ export const siteConfig = {
 
   /** Coordonnées de contact. `null` = information encore inconnue, affichée comme « [À COMPLÉTER] ». */
   contact: {
-    /** E-mail de test : sera remplacé par celui du Beth Habad. */
-    email: "dovbersitbon@gmail.com",
-    phone: null as string | null,
+    email: "mikelsitbon@gmail.com" as string | null,
+    /** Affiché tel quel ; le lien tel: est construit au format international (+33…). */
+    phone: "06 12 83 38 48" as string | null,
     /** Numéro WhatsApp au format international sans + ni espaces (ex. 33612345678). */
-    whatsapp: null as string | null,
+    whatsapp: "33612833848" as string | null,
   },
 
   /** Lien Allodons pour les dons. `null` tant qu'il n'a pas été fourni. */

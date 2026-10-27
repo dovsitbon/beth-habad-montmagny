@@ -5,16 +5,18 @@ import {
   InstagramLogoIcon,
   MapPinIcon,
   PhoneIcon,
+  WhatsappLogoIcon,
   YoutubeLogoIcon,
 } from "@phosphor-icons/react/ssr";
 import { mainNav } from "@/config/site.config";
 import { Todo } from "@/components/ui/todo";
 import { getSettings } from "@/lib/data/settings";
+import { telHref, whatsappHref } from "@/lib/format";
 
 export async function SiteFooter() {
   const settings = await getSettings();
   const { address } = settings;
-  const contact = { phone: settings.phone, email: settings.email };
+  const contact = { phone: settings.phone, email: settings.email, whatsapp: settings.whatsapp };
 
   return (
     <footer className="mt-auto bg-night-deep text-white/85">
@@ -34,7 +36,7 @@ export async function SiteFooter() {
             <p className="flex gap-3">
               <PhoneIcon aria-hidden weight="bold" className="mt-1 size-5 shrink-0 text-gold" />
               {contact.phone ? (
-                <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="underline-offset-4 hover:underline">
+                <a href={telHref(contact.phone)} className="underline-offset-4 hover:underline">
                   {contact.phone}
                 </a>
               ) : (
@@ -52,6 +54,18 @@ export async function SiteFooter() {
               </p>
             )}
           </address>
+          {contact.whatsapp && (
+            <a
+              href={whatsappHref(contact.whatsapp)}
+              target="_blank"
+              rel="noopener"
+              className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[#1F7A4D] px-5 font-bold text-white transition-colors hover:bg-[#186640]"
+            >
+              <WhatsappLogoIcon aria-hidden weight="fill" className="size-6" />
+              Écrire sur WhatsApp
+              <span className="sr-only">(ouvre WhatsApp dans un nouvel onglet)</span>
+            </a>
+          )}
           {Object.keys(settings.social).length > 0 && (
             <ul className="mt-5 flex gap-2" aria-label="Réseaux sociaux">
               {(

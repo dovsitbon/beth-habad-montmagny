@@ -106,13 +106,15 @@ export type Occasion = {
   start: number;
   end: number;
   /**
-   * Période où l'accueil affiche ces horaires en grand (ms UTC) : de la veille à 0 h
-   * jusqu'à l'Arvit de la sortie (Chabbat ou fête) + 30 min.
+   * Période où l'accueil et le bandeau affichent ces horaires (ms UTC) : de la veille à 8 h
+   * (le vendredi pour un Chabbat) jusqu'à l'Arvit de la sortie (Chabbat ou fête) + 30 min.
    */
   homeFrom: number;
   homeUntil: number;
 };
 
+/** Heure de la veille (vendredi) à partir de laquelle l'accueil affiche les horaires de Chabbat. */
+export const HOME_FROM_HOUR = 8;
 /** Minutes après l'Arvit de la sortie pendant lesquelles l'accueil garde les horaires de Chabbat. */
 export const HOME_MINUTES_AFTER_ARVIT = 30;
 
@@ -364,7 +366,7 @@ function buildOccasion(days: string[], yomtov: Set<string>, input: BuildInput): 
     computedClosing,
     start: localToMs(eve, allumage.minutes ?? 0, timeZone),
     end: localToMs(lastDay, finLine?.minutes ?? endOf(lastDay), timeZone),
-    homeFrom: localToMs(eve, 0, timeZone),
+    homeFrom: localToMs(eve, HOME_FROM_HOUR * 60, timeZone),
     homeUntil: localToMs(lastDay, arvitMinutes + HOME_MINUTES_AFTER_ARVIT, timeZone),
   };
 }

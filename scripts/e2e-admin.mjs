@@ -60,6 +60,9 @@ const today = new Date();
 // Date AAAA-MM-JJ à l'heure de Paris (toISOString donnerait la veille entre minuit et 1 h/2 h).
 const isoDate = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
 
+// Le test change le téléphone : on remet ensuite le vrai numéro du Beth Habad.
+const { data: originalSettings } = await service.from("settings").select("phone").eq("id", 1).single();
+
 try {
   console.log("\nConnexion");
   await page.goto(`${BASE}/auth/dev-login`);
@@ -278,7 +281,7 @@ async function cleanup() {
   await service.from("announcements").delete().like("message", "[E2E]%");
   await service.from("service_times").delete().like("note", "[E2E]%");
   await service.from("schedule_weeks").delete().like("kidouch", "[E2E]%");
-  await service.from("settings").update({ phone: null }).eq("id", 1);
+  await service.from("settings").update({ phone: originalSettings?.phone ?? null }).eq("id", 1);
 
   const { data: page } = await service.from("pages").select("body").eq("slug", "cours").single();
   if (page?.body.includes("[E2E]")) {

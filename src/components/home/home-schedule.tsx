@@ -1,15 +1,16 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import { formatHeure, hhmmToMinutes, homeOccasionKey } from "@/lib/horaires/calcul";
+import { weekdayIn } from "@/lib/horaires/bandeau";
+import { useNowSnapshot } from "@/components/shabbat/use-now-snapshot";
 
 type Window = { key: string; homeFrom: number; homeUntil: number };
 type Office = { id: string; office: "chaharit" | "minha" | "arvit"; day_type: string; time: string | null; note: string | null };
 
 type Props = {
-  /** Périodes des prochains Chabbatot et fêtes (veille 0 h → Arvit de la sortie + 30 min). */
+  /** Périodes des prochains Chabbatot et fêtes (veille 8 h → Arvit de la sortie + 30 min). */
   windows: Window[];
   /** Instant du calcul côté serveur : premier affichage identique au HTML reçu. */
   computedAt: number;
@@ -22,41 +23,18 @@ type Props = {
 const OFFICE_LABEL = { chaharit: "Chaharit", minha: "Minha", arvit: "Arvit" } as const;
 const OFFICE_ORDER = ["chaharit", "minha", "arvit"];
 
-// L'heure est revérifiée toutes les 30 s et au retour sur l'onglet : la bascule
-// Chabbat / semaine se fait à l'heure dite, quel que soit l'âge de la page en cache.
-function subscribe(onChange: () => void) {
-  const timer = setInterval(onChange, 30000);
-  document.addEventListener("visibilitychange", onChange);
-  window.addEventListener("focus", onChange);
-  return () => {
-    clearInterval(timer);
-    document.removeEventListener("visibilitychange", onChange);
-    window.removeEventListener("focus", onChange);
-  };
-}
-
-/** Jour de la semaine à Paris : 0 = dimanche … 6 = samedi. */
-function parisWeekday(now: number, timeZone: string): number {
-  const day = new Intl.DateTimeFormat("en-US", { timeZone, weekday: "short" }).format(now);
-  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(day);
-}
-
 /** « clé d'occasion|jour » : ne change qu'aux moments de bascule, donc peu de rendus. */
 function snapshot(windows: Window[], now: number, timeZone: string) {
-  return `${homeOccasionKey(windows, now) ?? ""}|${parisWeekday(now, timeZone)}`;
+  return `${homeOccasionKey(windows, now) ?? ""}|${weekdayIn(now, timeZone)}`;
 }
 
 /**
  * Bloc principal de l'accueil, juste sous la bannière :
- *  - du vendredi 0 h à la fin de Chabbat (Arvit + 30 min), et de même pour les fêtes : les horaires en grand ;
+ *  - du vendredi 8 h à la fin de Chabbat (Arvit + 30 min), et de même pour les fêtes : les horaires en grand ;
  *  - le reste de la semaine : « Offices de la semaine », ceux du jour mis en évidence.
  */
 export function HomeSchedule({ windows, computedAt, timeZone, occasionBlocks, offices }: Props) {
-  const state = useSyncExternalStore(
-    subscribe,
-    () => snapshot(windows, Date.now(), timeZone),
-    () => snapshot(windows, computedAt, timeZone),
-  );
+  const state = useNowSnapshot((now) => snapshot(windows, now, timeZone), computedAt);
   const [key, weekday] = state.split("|");
   const block = key ? occasionBlocks[key] : null;
   if (block) return <>{block}</>;
