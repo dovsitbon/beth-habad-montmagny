@@ -39,7 +39,7 @@ export function SettingsForm({ values }: { values: SettingsValues }) {
   return (
     <AdminForm action={action} pending={pending}>
       <FormMessage state={state} />
-      <Group title="Le Beth Habad">
+      <Group title="Nom et présentation">
         <TextField label="Nom complet" name="name" required defaultValue={v.name} error={e.name} />
         <TextField label="Nom court" name="shortName" required defaultValue={v.shortName} error={e.shortName} hint="Utilisé quand la place manque." />
         <TextField label="Phrase de présentation" name="tagline" defaultValue={v.tagline} hint="Affichée dans les résultats Google." />
