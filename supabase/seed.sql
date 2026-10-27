@@ -19,7 +19,7 @@ insert into public.settings (
 ) on conflict (id) do nothing;
 
 insert into public.settings_private (id, notification_email)
-values (1, 'dovbersitbon@gmail.com')
+values (1, 'mikelsitbon@gmail.com')
 on conflict (id) do nothing;
 
 insert into public.pages (slug, title, body) values
