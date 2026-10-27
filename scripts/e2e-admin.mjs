@@ -215,7 +215,11 @@ try {
 
   console.log("\nInscriptions");
   await go("/admin/inscriptions");
-  check("la liste des événements avec inscription s'affiche", await page.getByText("[EXEMPLE] Repas de Chabbat").isVisible());
+  // Les événements d'exemple peuvent avoir été mis à la corbeille avant l'ouverture : liste ou message vide.
+  check(
+    "la page des inscriptions s'affiche (liste ou « aucun événement »)",
+    (await page.getByText("[EXEMPLE] Repas de Chabbat").isVisible()) || (await page.getByText("Aucun événement avec inscription").isVisible()),
+  );
   const { data: repas } = await service.from("events").select("id").eq("slug", "exemple-repas-de-chabbat").single();
   const csv = await page.request.get(`${BASE}/admin/inscriptions/${repas.id}/export`);
   check("l'export CSV se télécharge", csv.ok() && (await csv.text()).includes('"Nom";"Nombre de personnes"'));
