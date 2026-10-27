@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr">
+  <body style="margin:0;padding:24px;background:#faf7f0;font-family:Arial,Helvetica,sans-serif;color:#18213a">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #e7e0d0;border-radius:12px">
+      <tr>
+        <td style="padding:32px">
+          <p style="margin:0 0 4px;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#7d6216">Espace de gestion</p>
+          <h1 style="margin:0 0 20px;font-family:Georgia,serif;font-size:26px;color:#0f2444">Votre lien de connexion</h1>
+          <p style="margin:0 0 24px;font-size:17px;line-height:1.5">Bonjour,<br>appuyez sur le bouton ci-dessous pour ouvrir l'espace de gestion du site.</p>
+          <p style="margin:0 0 28px">
+            <!-- Lien « token_hash » : fonctionne même si l'e-mail est ouvert dans une autre application que celle où la demande a été faite. -->
+            <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email" style="display:inline-block;padding:16px 28px;background:#c9a227;color:#0b1a33;font-weight:bold;font-size:18px;text-decoration:none;border-radius:6px">Me connecter</a>
+          </p>
+          <p style="margin:0 0 8px;font-size:15px;line-height:1.5">Ou saisissez ce code sur la page de connexion :</p>
+          <p style="margin:0 0 28px;font-size:30px;font-weight:bold;letter-spacing:6px;color:#0f2444">{{ .Token }}</p>
+          <p style="margin:0;font-size:13px;line-height:1.5;color:#545d70">Ce lien et ce code sont valables 1 heure et ne servent qu'une fois. Si vous n'avez rien demandé, ignorez simplement cet e-mail.</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
