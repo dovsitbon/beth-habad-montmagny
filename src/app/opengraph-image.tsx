@@ -34,12 +34,15 @@ export default async function OpengraphImage() {
         ) : (
           <div style={{ display: "flex", width: 120, height: 8, background: s.colors.accent, marginBottom: 40 }} />
         )}
-        <div style={{ display: "flex", fontSize: 88, fontWeight: 700, lineHeight: 1.05 }}>{s.name}</div>
+        <div style={{ display: "flex", fontSize: 34, color: s.colors.accent, letterSpacing: 4, textTransform: "uppercase" }}>
+          Centre communautaire
+        </div>
+        <div style={{ display: "flex", fontSize: 84, fontWeight: 700, lineHeight: 1.05, marginTop: 12 }}>{s.shortName}</div>
         <div style={{ display: "flex", fontSize: 38, marginTop: 30, color: s.colors.accent }}>
           Chabbat · Offices · Événements · Cours
         </div>
         <div style={{ display: "flex", fontSize: 30, marginTop: 16, opacity: 0.8 }}>
-          {[s.address.city, siteConfig.address.region].filter(Boolean).join(" · ")}
+          {siteConfig.address.region}
         </div>
       </div>
     ),

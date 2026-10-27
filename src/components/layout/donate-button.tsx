@@ -15,7 +15,7 @@ type Props = {
 export async function DonateButton({ className = "", size = "md" }: Props) {
   const { donationUrl } = await getSettings();
   const sizing = size === "lg" ? "h-14 px-7 text-lg" : "h-11 px-5 text-base";
-  const classes = `inline-flex items-center justify-center gap-2 rounded-md bg-gold font-bold text-night-deep transition-[background-color,transform] duration-150 hover:bg-gold-soft active:scale-[0.98] ${sizing} ${className}`;
+  const classes = `inline-flex items-center justify-center gap-2 rounded-md bg-gold font-bold whitespace-nowrap text-night-deep transition-[background-color,transform] duration-150 hover:bg-gold-soft active:scale-[0.98] ${sizing} ${className}`;
   const content = (
     <>
       <HandHeartIcon weight="fill" aria-hidden className="size-5 shrink-0" />

@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteConfig.url),
     title: {
       default: settings.name,
-      template: `%s · ${settings.name}`,
+      template: `%s · ${settings.shortName}`,
     },
     description: settings.tagline ?? siteConfig.description,
     openGraph: {

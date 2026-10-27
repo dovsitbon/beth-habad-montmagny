@@ -10,11 +10,11 @@
 
 insert into public.settings (
   id, name, short_name, address_street, address_postal_code, address_city,
-  latitude, longitude, email, candle_minutes
+  latitude, longitude, email, candle_minutes, color_primary, color_accent
 ) values (
-  1, 'Beth Habad de Montmagny', 'Beth Habad Montmagny',
+  1, 'Centre communautaire Beth Habad Montmagny · Groslay', 'Beth Habad Montmagny · Groslay',
   '4 bis, chemin de la Haie Barde', '95360', 'Montmagny',
-  48.976809, 2.346422, 'dovbersitbon@gmail.com', 18
+  48.976809, 2.346422, 'dovbersitbon@gmail.com', 18, '#17418B', '#CCAB5A'
 ) on conflict (id) do nothing;
 
 insert into public.settings_private (id, notification_email)
@@ -25,7 +25,7 @@ insert into public.pages (slug, title, body) values
   ('accueil', 'Présentation (page d''accueil)',
    '<p>[À COMPLÉTER] Quelques phrases de présentation du Beth Habad.</p>'),
   ('beth-habad', 'Le Beth Habad',
-   '<p>[À COMPLÉTER] Présentation et histoire du Beth Habad de Montmagny.</p>'),
+   '<p>[À COMPLÉTER] Présentation et histoire du Beth Habad Montmagny · Groslay.</p>'),
   ('rabbin', 'Le Rabbin',
    '<p>[À COMPLÉTER] Présentation du rabbin et de sa famille.</p>'),
   ('cteen', 'CTeen',
@@ -36,7 +36,7 @@ insert into public.pages (slug, title, body) values
    '<p>[À COMPLÉTER] Quelques mots pour expliquer à quoi servent les dons.</p>'),
   ('mentions-legales', 'Mentions légales',
    $tpl$<h2>Éditeur du site</h2>
-<p>Beth Habad de Montmagny — forme juridique [À COMPLÉTER] (par exemple : association loi 1901)<br>
+<p>Centre communautaire Beth Habad Montmagny · Groslay — forme juridique [À COMPLÉTER] (par exemple : association loi 1901)<br>
 Siège : 4 bis, chemin de la Haie Barde, 95360 Montmagny<br>
 Numéro RNA ou SIREN : [À COMPLÉTER]<br>
 Contact : voir la page <a href="/contact">Contact</a></p>
@@ -52,7 +52,7 @@ Contact : voir la page <a href="/contact">Contact</a></p>
 Base de données et photos hébergées par Supabase, sur des serveurs situés en France (région de Paris).</p>
 
 <h2>Propriété intellectuelle</h2>
-<p>Les textes et photos publiés sur ce site appartiennent au Beth Habad de Montmagny ou à leurs auteurs, sauf mention contraire. Toute reproduction sans autorisation est interdite.</p>
+<p>Les textes et photos publiés sur ce site appartiennent au Centre communautaire Beth Habad Montmagny · Groslay ou à leurs auteurs, sauf mention contraire. Toute reproduction sans autorisation est interdite.</p>
 
 <h2>Crédits</h2>
 <p>Horaires de Chabbat et des fêtes calculés avec Hebcal (hebcal.com). Carte : © les contributeurs d'OpenStreetMap.</p>
@@ -60,10 +60,10 @@ Base de données et photos hébergées par Supabase, sur des serveurs situés en
 <h2>Données personnelles</h2>
 <p>Voir la <a href="/confidentialite">politique de confidentialité</a>.</p>$tpl$),
   ('confidentialite', 'Politique de confidentialité',
-   $tpl$<p>Le Beth Habad de Montmagny attache une grande importance à la protection de vos données. Cette page explique quelles informations le site recueille, pourquoi, combien de temps elles sont gardées et comment exercer vos droits.</p>
+   $tpl$<p>Le Centre communautaire Beth Habad Montmagny · Groslay attache une grande importance à la protection de vos données. Cette page explique quelles informations le site recueille, pourquoi, combien de temps elles sont gardées et comment exercer vos droits.</p>
 
 <h2>Responsable du traitement</h2>
-<p>Beth Habad de Montmagny, 4 bis, chemin de la Haie Barde, 95360 Montmagny. Contact : voir la page <a href="/contact">Contact</a>.</p>
+<p>Centre communautaire Beth Habad Montmagny · Groslay, 4 bis, chemin de la Haie Barde, 95360 Montmagny. Contact : voir la page <a href="/contact">Contact</a>.</p>
 
 <h2>Données recueillies et utilisation</h2>
 <ul>
@@ -105,20 +105,20 @@ begin
      -- Vendredi soir de la semaine prochaine, 20 h (heure de Paris)
      (date_trunc('week', now() at time zone 'Europe/Paris') + interval '11 days 20 hours') at time zone 'Europe/Paris',
      (date_trunc('week', now() at time zone 'Europe/Paris') + interval '11 days 23 hours') at time zone 'Europe/Paris',
-     'Beth Habad de Montmagny', '[EXEMPLE] 20 € / adulte', true, 40, 'published'),
+     'Beth Habad Montmagny · Groslay', '[EXEMPLE] 20 € / adulte', true, 40, 'published'),
     ('exemple-soiree-cteen', 'cteen', '[EXEMPLE] Soirée CTeen',
      'Exemple d''activité pour les ados.',
      '<p>Ceci est une activité CTeen d''exemple.</p>',
      -- Mardi de la semaine prochaine, 18 h 30
      (date_trunc('week', now() at time zone 'Europe/Paris') + interval '8 days 18 hours 30 minutes') at time zone 'Europe/Paris',
      (date_trunc('week', now() at time zone 'Europe/Paris') + interval '8 days 20 hours 30 minutes') at time zone 'Europe/Paris',
-     'Beth Habad de Montmagny', null, true, null, 'published'),
+     'Beth Habad Montmagny · Groslay', null, true, null, 'published'),
     ('exemple-evenement-passe', 'general', '[EXEMPLE] Événement passé',
      'Exemple d''événement terminé (pour l''onglet « passés »).',
      '<p>Ceci est un événement passé d''exemple.</p>',
      -- Dimanche, il y a deux semaines, 20 h
      (date_trunc('week', now() at time zone 'Europe/Paris') - interval '8 days' + interval '20 hours') at time zone 'Europe/Paris',
-     null, 'Beth Habad de Montmagny', null, false, null, 'published'),
+     null, 'Beth Habad Montmagny · Groslay', null, false, null, 'published'),
     ('exemple-brouillon', 'general', '[EXEMPLE] Événement en brouillon',
      'Invisible pour le public tant qu''il n''est pas publié.',
      '<p>Brouillon d''exemple.</p>',
@@ -129,11 +129,11 @@ begin
     (title, audience, day_of_week, start_time, end_time, speaker, location, description, sort_order, status)
   values
     ('[EXEMPLE] Cours de Torah hebdomadaire', 'tous', 2, '20:30', '21:30',
-     '[EXEMPLE] Intervenant', 'Beth Habad de Montmagny', '<p>Cours d''exemple.</p>', 1, 'published'),
+     '[EXEMPLE] Intervenant', 'Beth Habad Montmagny · Groslay', '<p>Cours d''exemple.</p>', 1, 'published'),
     ('[EXEMPLE] Activité pour les femmes', 'femmes', 0, '10:00', '11:30',
-     '[EXEMPLE] Intervenante', 'Beth Habad de Montmagny', '<p>Activité d''exemple.</p>', 2, 'published'),
+     '[EXEMPLE] Intervenante', 'Beth Habad Montmagny · Groslay', '<p>Activité d''exemple.</p>', 2, 'published'),
     ('[EXEMPLE] Atelier pour les enfants', 'enfants', 3, '14:00', '16:00',
-     null, 'Beth Habad de Montmagny', '<p>Atelier d''exemple.</p>', 3, 'published');
+     null, 'Beth Habad Montmagny · Groslay', '<p>Atelier d''exemple.</p>', 3, 'published');
 
   insert into public.service_times (office, day_type, time, note, sort_order) values
     ('chaharit', 'semaine', '07:00', '[EXEMPLE] horaire à remplacer', 1),

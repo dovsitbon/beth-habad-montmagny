@@ -1,4 +1,4 @@
-# Site du Beth Habad de Montmagny
+# Site du Centre communautaire Beth Habad Montmagny · Groslay
 
 Site public et espace de gestion d'un Beth Habad, conçu pour être **entièrement administré depuis un téléphone** par une personne non technique. Il sert aussi de **modèle réutilisable** pour d'autres Beth Habad : on change la configuration, pas le code.
 

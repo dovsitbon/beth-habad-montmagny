@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { siteConfig } from "@/config/site.config";
+import { areaProse, siteConfig } from "@/config/site.config";
 import Image from "next/image";
 import { UserIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
@@ -21,7 +21,7 @@ export default async function BethHabadPage() {
   return (
     <>
       <PageHeader eyebrow="Qui sommes-nous" title={presentation?.title ?? "Le Beth Habad"}>
-        <p>{settings.name}, au service de la communauté juive de {settings.address.city} et des environs.</p>
+        <p>{settings.name}, au service de la communauté juive de {areaProse} et des environs.</p>
       </PageHeader>
 
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 sm:px-6 sm:py-16">

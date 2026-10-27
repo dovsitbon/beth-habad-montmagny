@@ -46,7 +46,7 @@ export default async function OfficesPage() {
   return (
     <>
       <PageHeader eyebrow="Synagogue" title="Horaires des offices">
-        <p>Chaharit, Minha et Arvit au Beth Habad de {settings.address.city}.</p>
+        <p>Chaharit, Minha et Arvit au {settings.shortName}.</p>
       </PageHeader>
 
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">

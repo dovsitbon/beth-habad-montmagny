@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { siteConfig } from "@/config/site.config";
 
 export const metadata: Metadata = {
   title: { default: "Espace de gestion", template: "%s · Admin Beth Habad" },
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0F2444",
+  themeColor: siteConfig.colors.primary,
 };
 
 export default function AdminRootLayout({ children }: LayoutProps<"/admin">) {

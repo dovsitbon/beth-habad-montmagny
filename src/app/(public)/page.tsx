@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   return {
     // Titre complet (sans le suffixe du modèle) : le nom seul est trop vague pour Google.
-    title: { absolute: `${s.name} : synagogue, horaires de Chabbat et événements à ${s.address.city ?? ""}`.trim() },
+    title: { absolute: `${s.shortName} : centre communautaire, horaires de Chabbat et événements` },
     alternates: { canonical: "/" },
   };
 }
@@ -46,9 +46,9 @@ export default async function HomePage() {
         <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gold" />
         <div className="mx-auto max-w-6xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-24">
           <p className="text-sm font-semibold tracking-[0.18em] text-gold-soft uppercase">
-            {settings.address.city} · {siteConfig.address.region}
+            Centre communautaire · {siteConfig.address.region}
           </p>
-          <h1 className="mt-4 max-w-3xl text-4xl font-semibold text-white sm:text-6xl">{settings.name}</h1>
+          <h1 className="mt-4 max-w-3xl text-4xl font-semibold text-white sm:text-6xl">{settings.shortName}</h1>
           {intro?.body && <RichText html={intro.body} className="mt-6 max-w-2xl text-lg text-white/85" />}
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <DonateButton size="lg" />

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { siteConfig } from "@/config/site.config";
+import { areaLabel } from "@/config/site.config";
 import { PageHeader } from "@/components/ui/page-header";
 import { RichText } from "@/components/ui/rich-text";
 import { EventGrid } from "@/components/events/event-grid";
@@ -8,7 +8,7 @@ import { getPage, getPastEvents, getUpcomingEvents } from "@/lib/data/content";
 export const metadata: Metadata = {
   alternates: { canonical: "/cteen" },
   title: "CTeen, pour les ados",
-  description: `CTeen ${siteConfig.address.city} : soirées, sorties et activités pour les adolescents juifs, avec inscription en ligne.`,
+  description: `CTeen ${areaLabel} : soirées, sorties et activités pour les adolescents juifs, avec inscription en ligne.`,
 };
 
 export default async function CteenPage() {

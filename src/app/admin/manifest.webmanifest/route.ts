@@ -1,3 +1,4 @@
+import { siteConfig } from "@/config/site.config";
 /**
  * Manifeste de l'application « Admin Beth Habad » : permet de l'installer sur l'écran
  * d'accueil du téléphone (elle s'ouvre alors en plein écran, comme une application).
@@ -15,7 +16,7 @@ export function GET() {
       display: "standalone",
       orientation: "portrait",
       background_color: "#FAF7F0",
-      theme_color: "#0F2444",
+      theme_color: siteConfig.colors.primary,
       icons: [
         { src: "/admin-icons/icon-192.png", sizes: "192x192", type: "image/png" },
         { src: "/admin-icons/icon-512.png", sizes: "512x512", type: "image/png" },

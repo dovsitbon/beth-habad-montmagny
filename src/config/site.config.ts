@@ -13,13 +13,15 @@ export const siteConfig = {
   /** Identifiant technique court (sans espaces), utilisé pour les noms de fichiers, la PWA, etc. */
   slug: "montmagny",
 
-  /** Nom complet affiché partout sur le site. */
-  name: "Beth Habad de Montmagny",
-  /** Nom court (onglet du navigateur, icône PWA). */
-  shortName: "Beth Habad Montmagny",
+  /** Nom officiel complet (tel qu'il figure sur le logo). */
+  name: "Centre communautaire Beth Habad Montmagny · Groslay",
+  /** Nom court (titre de l'accueil, onglets du navigateur). */
+  shortName: "Beth Habad Montmagny · Groslay",
+  /** Villes desservies, affichées sous « Beth Habad » dans l'en-tête et dans les textes. */
+  area: ["Montmagny", "Groslay"],
   /** Phrase de présentation par défaut (SEO). */
   description:
-    "Beth Habad de Montmagny (Val-d'Oise) : horaires de Chabbat et des offices, événements, cours de Torah, CTeen et vie communautaire.",
+    "Centre communautaire Beth Habad Montmagny · Groslay (Val-d'Oise) : horaires de Chabbat et des offices, événements, cours de Torah, CTeen et vie communautaire.",
 
   /** URL publique du site (sans / final). Remplacée par la variable d'environnement si elle existe. */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
@@ -55,10 +57,10 @@ export const siteConfig = {
 
   /** Couleurs de la charte (modifiables ensuite par l'admin). */
   colors: {
-    /** Bleu nuit */
-    primary: "#0F2444",
-    /** Or */
-    accent: "#C9A227",
+    /** Bleu du logo */
+    primary: "#17418B",
+    /** Or du logo */
+    accent: "#CCAB5A",
   },
 } as const;
 
@@ -75,3 +77,9 @@ export const mainNav = [
   { href: "/beth-habad", label: "Le Beth Habad" },
   { href: "/contact", label: "Contact" },
 ] as const;
+
+/** « Montmagny · Groslay » (en-tête, logo). */
+export const areaLabel = siteConfig.area.join(" · ");
+/** « Montmagny et Groslay » (dans une phrase). */
+export const areaProse =
+  siteConfig.area.length > 1 ? `${siteConfig.area.slice(0, -1).join(", ")} et ${siteConfig.area.at(-1)}` : siteConfig.area[0];

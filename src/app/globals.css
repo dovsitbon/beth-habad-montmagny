@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 /*
- * Charte : bleu nuit et or, fond papier chaud.
+ * Charte : bleu et or du logo, fond papier chaud.
  * Les deux couleurs de marque (--brand-primary, --brand-accent) peuvent être
  * remplacées à l'exécution depuis les paramètres (style inline sur <html>) :
  * toutes les nuances en dérivent via color-mix().
  */
 :root {
-  --brand-primary: #0f2444;
-  --brand-accent: #c9a227;
+  --brand-primary: #17418b;
+  --brand-accent: #ccab5a;
 
   --canvas: #faf7f0;
   --surface: #ffffff;

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { mediaUrl } from "@/lib/format";
-import { mainNav } from "@/config/site.config";
+import { areaLabel, mainNav } from "@/config/site.config";
 import { getSettings } from "@/lib/data/settings";
 import { DonateButton } from "./donate-button";
 import { MobileMenu } from "./mobile-menu";
@@ -42,15 +42,15 @@ export async function SiteHeader() {
           )}
           <span className="flex flex-col leading-none">
             <span className="font-serif text-xl font-semibold whitespace-nowrap text-night sm:text-2xl">Beth Habad</span>
-            <span className="mt-1 text-xs font-semibold tracking-[0.18em] text-gold-ink uppercase">
-              {settings.address.city}
+            <span className="mt-1 text-xs font-semibold tracking-[0.12em] whitespace-nowrap text-gold-ink uppercase">
+              {areaLabel}
             </span>
           </span>
           <span className="sr-only">, retour à l&apos;accueil</span>
         </Link>
 
         <nav aria-label="Navigation principale" className="hidden xl:block">
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center gap-0.5">
             {mainNav.map((item) => (
               <li key={item.href}>
                 <NavLink href={item.href}>{item.label}</NavLink>
