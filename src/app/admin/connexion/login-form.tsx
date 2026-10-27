@@ -5,6 +5,8 @@ import { EnvelopeSimpleOpenIcon } from "@phosphor-icons/react";
 import { sendLoginLink, verifyLoginCode, type LoginState } from "./actions";
 import { FormMessage, SubmitButton, TextField } from "@/components/admin/fields";
 
+const CODE_IN_EMAIL = process.env.NEXT_PUBLIC_LOGIN_CODE_IN_EMAIL === "1";
+
 export function LoginForm() {
   const [linkState, sendLink] = useActionState(sendLoginLink, { step: "email" } as LoginState);
   const [codeState, verifyCode] = useActionState(verifyLoginCode, { step: "code" } as LoginState);
@@ -17,10 +19,14 @@ export function LoginForm() {
           <EnvelopeSimpleOpenIcon aria-hidden weight="duotone" className="size-10 text-gold-ink" />
           <p className="mt-3 text-lg font-semibold">Regardez vos e-mails</p>
           <p className="mt-1 text-ink-muted">{linkState.message}</p>
-          <p className="mt-3 text-sm text-ink-muted">Pensez à vérifier le dossier « Courrier indésirable ».</p>
+          <p className="mt-3 text-sm text-ink-muted">
+            Pensez à vérifier le dossier « Courrier indésirable ». Si vous demandez un nouvel e-mail, seul le
+            dernier reçu fonctionnera.
+          </p>
         </div>
 
-        {showCode ? (
+        {/* Le code n'apparaît que dans l'e-mail personnalisé (actif une fois le SMTP configuré). */}
+        {!CODE_IN_EMAIL ? null : showCode ? (
           <form action={verifyCode} className="space-y-4">
             <input type="hidden" name="email" value={linkState.email} />
             <TextField
