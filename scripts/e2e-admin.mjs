@@ -150,7 +150,7 @@ try {
   const home = await publicText("/");
   check("le Kidouch apparaît dans « Ce Chabbat » sur l'accueil", home.includes("[E2E] Grand Kidouch"));
   page.once("dialog", (d) => d.accept());
-  await Promise.all([page.waitForURL(/message=enregistre/), page.getByRole("button", { name: "Revenir au calcul automatique" }).click()]);
+  await Promise.all([page.waitForURL(/message=recalcule/), page.getByRole("button", { name: "Revenir au calcul automatique" }).click()]);
   check("« Revenir au calcul » efface les changements", !(await page.locator("pre").textContent())?.includes("[E2E]"));
 
   console.log("\nÉvénement avec photo");

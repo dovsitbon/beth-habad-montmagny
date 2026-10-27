@@ -123,5 +123,5 @@ export async function resetWeek(form: FormData) {
   const supabase = await createSessionClient();
   await supabase.from("schedule_weeks").delete().eq("date", key);
   refreshSite("schedule_weeks", "hebcal");
-  redirect(`/admin/ce-chabbat?semaine=${key}&message=enregistre`);
+  redirect(`/admin/ce-chabbat?semaine=${key}&message=recalcule`);
 }

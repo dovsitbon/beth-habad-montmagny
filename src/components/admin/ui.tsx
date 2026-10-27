@@ -44,6 +44,7 @@ const FLASH: Record<string, string> = {
   corbeille: "Mis à la corbeille. Vous pouvez le récupérer pendant 30 jours.",
   restaure: "C'est restauré.",
   supprime: "C'est supprimé.",
+  recalcule: "C'est fait : les horaires calculés sont rétablis pour cette semaine.",
   invite: "La personne a été ajoutée. Elle peut maintenant se connecter avec son adresse e-mail.",
   "reserve-admin": "Cette partie est réservée à l'administrateur du site.",
   introuvable: "Cet élément n'existe plus (il a peut-être été supprimé).",
