@@ -2,10 +2,10 @@ import Link from "next/link";
 import {
   CalendarPlusIcon,
   ChatCircleTextIcon,
-  ClockIcon,
   ImagesIcon,
   ListChecksIcon,
   MegaphoneSimpleIcon,
+  SunHorizonIcon,
 } from "@phosphor-icons/react/ssr";
 import { requireMember } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
@@ -18,8 +18,8 @@ export const metadata = { title: "Tableau de bord" };
 
 /** Les six actions les plus fréquentes, en très gros boutons. */
 const MAIN_ACTIONS = [
+  { href: "/admin/ce-chabbat", label: "Horaires de ce Chabbat", Icon: SunHorizonIcon },
   { href: "/admin/evenements/nouveau", label: "Ajouter un événement", Icon: CalendarPlusIcon },
-  { href: "/admin/offices", label: "Modifier les horaires des offices", Icon: ClockIcon },
   { href: "/admin/annonces/nouvelle", label: "Publier une annonce", Icon: MegaphoneSimpleIcon },
   { href: "/admin/galerie", label: "Ajouter des photos", Icon: ImagesIcon },
   { href: "/admin/inscriptions", label: "Voir les inscriptions", Icon: ListChecksIcon },

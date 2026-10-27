@@ -10,11 +10,12 @@
 
 insert into public.settings (
   id, name, short_name, address_street, address_postal_code, address_city,
-  latitude, longitude, email, candle_minutes, color_primary, color_accent
+  latitude, longitude, email, candle_minutes, end_margin_minutes, color_primary, color_accent
 ) values (
   1, 'Centre communautaire Beth Habad Montmagny · Groslay', 'Beth Habad Montmagny · Groslay',
   '4 bis, chemin de la Haie Barde', '95360', 'Montmagny',
-  48.976809, 2.346422, 'dovbersitbon@gmail.com', 18, '#17418B', '#CCAB5A'
+  -- Allumage 17 min avant le coucher, Fin = nuit (8,5°) + 1 min : les horaires du rabbin.
+  48.976809, 2.346422, 'dovbersitbon@gmail.com', 17, 1, '#17418B', '#CCAB5A'
 ) on conflict (id) do nothing;
 
 insert into public.settings_private (id, notification_email)
@@ -138,9 +139,6 @@ begin
   insert into public.service_times (office, day_type, time, note, sort_order) values
     ('chaharit', 'semaine', '07:00', '[EXEMPLE] horaire à remplacer', 1),
     ('chaharit', 'dimanche', '08:30', '[EXEMPLE] horaire à remplacer', 2),
-    ('chaharit', 'chabbat', '09:30', '[EXEMPLE] horaire à remplacer', 3),
-    ('minha', 'vendredi', null, '[EXEMPLE] 10 min après l''allumage', 1),
-    ('minha', 'chabbat', null, '[EXEMPLE] 1 h avant la Havdala', 2),
     ('arvit', 'semaine', '20:00', '[EXEMPLE] horaire à remplacer', 1);
 
   insert into public.announcements (message, level, is_active, expires_at)

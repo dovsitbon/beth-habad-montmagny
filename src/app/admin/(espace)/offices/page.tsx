@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireMember } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { formatTime } from "@/lib/format";
@@ -23,6 +24,14 @@ export default async function AdminOfficesPage({ searchParams }: PageProps<"/adm
   return (
     <AdminPage title="Horaires des offices">
       <Flash code={message} />
+
+      <p className="-mt-3 mb-6 text-ink-muted">
+        Les offices du vendredi soir et du Chabbat se règlent dans{" "}
+        <Link href="/admin/ce-chabbat" className="font-semibold text-night underline underline-offset-4">
+          Ce Chabbat
+        </Link>
+        .
+      </p>
 
       <section className="mb-8 rounded-xl border border-line bg-surface p-4">
         <ServicesNoteForm note={settings?.services_note ?? ""} />

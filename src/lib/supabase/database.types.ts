@@ -455,22 +455,32 @@ export type Database = {
           address_city: string | null
           address_postal_code: string | null
           address_street: string | null
+          arvit_after_end: number
           candle_minutes: number
+          chaharit_time: string
           color_accent: string
           color_primary: string
+          cours_before_end: number | null
+          cours_time: string
           donation_url: string | null
           email: string | null
+          end_margin_minutes: number
+          friday_minha_offset: number
+          friday_minha_rounding: number
           havdalah_minutes: number | null
           id: number
           latitude: number
           logo_path: string | null
           longitude: number
+          minha_before_end: number | null
+          minha_time: string
           name: string
           phone: string | null
           services_note: string | null
           short_name: string
           social: Json
           tagline: string | null
+          tania_time: string
           updated_at: string
           whatsapp: string | null
         }
@@ -478,22 +488,32 @@ export type Database = {
           address_city?: string | null
           address_postal_code?: string | null
           address_street?: string | null
+          arvit_after_end?: number
           candle_minutes?: number
+          chaharit_time?: string
           color_accent?: string
           color_primary?: string
+          cours_before_end?: number | null
+          cours_time?: string
           donation_url?: string | null
           email?: string | null
+          end_margin_minutes?: number
+          friday_minha_offset?: number
+          friday_minha_rounding?: number
           havdalah_minutes?: number | null
           id?: number
           latitude: number
           logo_path?: string | null
           longitude: number
+          minha_before_end?: number | null
+          minha_time?: string
           name: string
           phone?: string | null
           services_note?: string | null
           short_name: string
           social?: Json
           tagline?: string | null
+          tania_time?: string
           updated_at?: string
           whatsapp?: string | null
         }
@@ -501,22 +521,32 @@ export type Database = {
           address_city?: string | null
           address_postal_code?: string | null
           address_street?: string | null
+          arvit_after_end?: number
           candle_minutes?: number
+          chaharit_time?: string
           color_accent?: string
           color_primary?: string
+          cours_before_end?: number | null
+          cours_time?: string
           donation_url?: string | null
           email?: string | null
+          end_margin_minutes?: number
+          friday_minha_offset?: number
+          friday_minha_rounding?: number
           havdalah_minutes?: number | null
           id?: number
           latitude?: number
           logo_path?: string | null
           longitude?: number
+          minha_before_end?: number | null
+          minha_time?: string
           name?: string
           phone?: string | null
           services_note?: string | null
           short_name?: string
           social?: Json
           tagline?: string | null
+          tania_time?: string
           updated_at?: string
           whatsapp?: string | null
         }
@@ -540,30 +570,39 @@ export type Database = {
         }
         Relationships: []
       }
-      shabbat_overrides: {
+      schedule_weeks: {
         Row: {
-          created_at: string
+          closing: string | null
           date: string
-          id: string
-          kind: Database["public"]["Enums"]["shabbat_time_kind"]
+          extra_lines: Json
+          hidden: string[]
+          kidouch: string | null
           note: string | null
-          time: string
+          times: Json
+          title: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string
+          closing?: string | null
           date: string
-          id?: string
-          kind: Database["public"]["Enums"]["shabbat_time_kind"]
+          extra_lines?: Json
+          hidden?: string[]
+          kidouch?: string | null
           note?: string | null
-          time: string
+          times?: Json
+          title?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string
+          closing?: string | null
           date?: string
-          id?: string
-          kind?: Database["public"]["Enums"]["shabbat_time_kind"]
+          extra_lines?: Json
+          hidden?: string[]
+          kidouch?: string | null
           note?: string | null
-          time?: string
+          times?: Json
+          title?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -604,7 +643,6 @@ export type Database = {
       event_category: "general" | "cteen"
       service_day: "semaine" | "dimanche" | "vendredi" | "chabbat" | "fete"
       service_office: "chaharit" | "minha" | "arvit"
-      shabbat_time_kind: "allumage" | "havdala"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -739,7 +777,6 @@ export const Constants = {
       event_category: ["general", "cteen"],
       service_day: ["semaine", "dimanche", "vendredi", "chabbat", "fete"],
       service_office: ["chaharit", "minha", "arvit"],
-      shabbat_time_kind: ["allumage", "havdala"],
     },
   },
 } as const

@@ -163,9 +163,9 @@ html {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Bannière d'accueil sans vidéo : zoom lent sur la photo (Ken Burns). */
+  /* Bannière d'accueil : zoom très lent sur la photo (Ken Burns). */
   .ken-burns {
-    animation: ken-burns 24s ease-in-out infinite alternate;
+    animation: ken-burns 40s ease-in-out infinite alternate;
   }
 
   /* Effets liés au défilement, sans JavaScript ; ignorés par les navigateurs qui ne les gèrent pas. */

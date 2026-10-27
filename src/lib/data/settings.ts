@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { siteConfig } from "@/config/site.config";
 import { createPublicClient } from "@/lib/supabase/public";
+import type { ScheduleRules } from "@/lib/horaires/calcul";
 
 export type SiteSettings = {
   name: string;
@@ -14,11 +15,27 @@ export type SiteSettings = {
   donationUrl: string | null;
   social: { facebook?: string; instagram?: string; youtube?: string };
   candleMinutes: number;
-  /** null = Havdala à la tombée de la nuit (8,5°) */
+  /** null = Fin à la tombée de la nuit (8,5°) */
   havdalahMinutes: number | null;
   servicesNote: string | null;
   logoPath: string | null;
   colors: { primary: string; accent: string };
+  /** Règles de calcul des horaires de Chabbat et des fêtes (page « Ce Chabbat »). */
+  schedule: ScheduleRules;
+};
+
+/** Règles par défaut (celles du message du rabbin), si la base n'a pas encore les colonnes. */
+const DEFAULT_SCHEDULE: Omit<ScheduleRules, "candleMinutes" | "havdalahMinutes"> = {
+  endMarginMinutes: 0,
+  fridayMinhaOffset: 2,
+  fridayMinhaRounding: 5,
+  taniaTime: "08:30",
+  chaharitTime: "09:15",
+  coursTime: "17:00",
+  coursBeforeEnd: null,
+  minhaTime: "18:00",
+  minhaBeforeEnd: null,
+  arvitAfterEnd: 10,
 };
 
 /** Valeurs de secours issues de site.config.ts (si la base est vide ou injoignable). */
@@ -43,6 +60,7 @@ function fallback(): SiteSettings {
     servicesNote: null,
     logoPath: null,
     colors: { ...siteConfig.colors },
+    schedule: { candleMinutes: 18, havdalahMinutes: null, ...DEFAULT_SCHEDULE },
   };
 }
 
@@ -77,5 +95,19 @@ export async function getSettings(): Promise<SiteSettings> {
     servicesNote: data.services_note,
     logoPath: data.logo_path,
     colors: { primary: data.color_primary, accent: data.color_accent },
+    schedule: {
+      candleMinutes: data.candle_minutes,
+      havdalahMinutes: data.havdalah_minutes,
+      endMarginMinutes: data.end_margin_minutes ?? DEFAULT_SCHEDULE.endMarginMinutes,
+      fridayMinhaOffset: data.friday_minha_offset ?? DEFAULT_SCHEDULE.fridayMinhaOffset,
+      fridayMinhaRounding: data.friday_minha_rounding ?? DEFAULT_SCHEDULE.fridayMinhaRounding,
+      taniaTime: data.tania_time ?? DEFAULT_SCHEDULE.taniaTime,
+      chaharitTime: data.chaharit_time ?? DEFAULT_SCHEDULE.chaharitTime,
+      coursTime: data.cours_time ?? DEFAULT_SCHEDULE.coursTime,
+      coursBeforeEnd: data.cours_before_end ?? null,
+      minhaTime: data.minha_time ?? DEFAULT_SCHEDULE.minhaTime,
+      minhaBeforeEnd: data.minha_before_end ?? null,
+      arvitAfterEnd: data.arvit_after_end ?? DEFAULT_SCHEDULE.arvitAfterEnd,
+    },
   };
 }

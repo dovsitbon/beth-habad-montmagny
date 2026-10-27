@@ -24,7 +24,7 @@ export async function GET() {
     "",
     "## Pages principales",
     "",
-    `- [Horaires de Chabbat et des fêtes](${base}/horaires) : allumage des bougies, Havdala, fêtes juives, calculés pour ${s.address.city}`,
+    `- [Horaires de Chabbat et des fêtes](${base}/horaires) : allumage des bougies, offices, fin de Chabbat et fêtes juives, calculés pour ${s.address.city}`,
     `- [Horaires des offices](${base}/offices) : Chaharit, Minha, Arvit`,
     `- [Événements](${base}/evenements) : agenda et inscriptions`,
     `- [Cours et activités](${base}/cours)`,

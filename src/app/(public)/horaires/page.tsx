@@ -4,16 +4,17 @@ import { WarningCircleIcon } from "@phosphor-icons/react/ssr";
 import { PageHeader } from "@/components/ui/page-header";
 import { photos } from "@/lib/community-photos";
 import { ShabbatCard } from "@/components/shabbat/shabbat-card";
-import { TimeValue } from "@/components/shabbat/time-value";
+import { ScheduleBlock } from "@/components/shabbat/schedule-block";
 import { getCalendar, type HolidayDay } from "@/lib/hebcal";
 import { getSettings } from "@/lib/data/settings";
-import { formatDayLong, formatDayShort, formatTime, hebrewDate, timeAttr } from "@/lib/format";
+import { formatDayLong, formatDayShort, hebrewDate } from "@/lib/format";
+import { lineValue, type Occasion } from "@/lib/horaires/calcul";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/horaires" },
   title: "Horaires de Chabbat et des fêtes",
   description:
-    `Heures d'allumage des bougies, de Havdala et des fêtes juives pour ${siteConfig.address.city} (${siteConfig.address.region}), calculées chaque semaine.`,
+    `Heures d'allumage des bougies, des offices et de fin de Chabbat et des fêtes juives pour ${siteConfig.address.city} (${siteConfig.address.region}), chaque semaine.`,
 };
 
 const KIND_LABEL: Record<HolidayDay["names"][number]["kind"], string | null> = {
@@ -37,9 +38,24 @@ function groupByMonth(days: HolidayDay[]) {
   return [...groups.entries()];
 }
 
+/** Allumage et Fin d'une occasion, pour le tableau des Chabbatot suivants. */
+function summary(o: Occasion) {
+  const lines = o.sections.flatMap((s) => s.lines);
+  const allumage = lines.find((l) => l.id === `${o.key}:allumage`);
+  const fin = lines.find((l) => l.id.endsWith(":fin"));
+  return {
+    date: o.days.find((d) => new Date(`${d}T12:00:00Z`).getUTCDay() === 6) ?? o.days[0],
+    name: o.title.replace(/^Horaires\s+/i, ""),
+    allumage: allumage ? lineValue(allumage) : "—",
+    fin: fin ? lineValue(fin) : "—",
+  };
+}
+
 export default async function HorairesPage() {
   const [calendar, settings] = await Promise.all([getCalendar(), getSettings()]);
   const today = calendar ? hebrewDate(calendar.today) : null;
+  const following = calendar ? calendar.occasions.filter((o) => o.key !== calendar.current?.key && o.end > (calendar.current?.end ?? 0)).slice(0, 8) : [];
+  const rules = settings.schedule;
 
   return (
     <>
@@ -57,51 +73,68 @@ export default async function HorairesPage() {
       </PageHeader>
 
       <div className="mx-auto max-w-6xl space-y-12 px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid gap-6 lg:grid-cols-5">
+        <div className="grid items-start gap-6 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <ShabbatCard shabbat={calendar?.thisShabbat ?? null} showMoreLink={false} />
+            <ShabbatCard occasion={calendar?.current ?? null} showMoreLink={false} />
           </div>
 
-          <section aria-labelledby="prochains-chabbat" className="rounded-xl border border-line bg-surface p-6 sm:p-8 lg:col-span-3">
-            <h2 id="prochains-chabbat" className="text-3xl text-night">
-              Les Chabbatot suivants
-            </h2>
-            {calendar && calendar.upcomingShabbatot.length > 0 ? (
-              <table className="mt-5 w-full text-left">
-                <thead className="text-sm text-ink-muted">
-                  <tr className="border-b border-line">
-                    <th scope="col" className="py-2 pr-3 font-semibold">
-                      Chabbat
-                    </th>
-                    <th scope="col" className="py-2 px-3 text-right font-semibold">
-                      Allumage
-                    </th>
-                    <th scope="col" className="py-2 pl-3 text-right font-semibold">
-                      Havdala
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {calendar.upcomingShabbatot.map((s) => (
-                    <tr key={s.date}>
-                      <th scope="row" className="py-3 pr-3 align-top font-normal">
-                        <span className="block font-semibold text-night">{formatDayShort(s.date)}</span>
-                        <span className="text-sm text-ink-muted">{s.parasha ?? s.special}</span>
-                      </th>
-                      <td className="py-3 px-3 text-right align-top font-semibold">
-                        <TimeValue entry={s.candles} />
-                      </td>
-                      <td className="py-3 pl-3 text-right align-top font-semibold">
-                        <TimeValue entry={s.havdalah} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <Unavailable />
+          <div className="space-y-6 lg:col-span-3">
+            {calendar?.nextHoliday && (
+              <section aria-labelledby="prochaine-fete" className="rounded-xl border border-gold/60 bg-surface p-6 sm:p-8">
+                <p className="text-sm font-semibold tracking-[0.14em] text-gold-ink uppercase">Prochaine fête</p>
+                <h2 id="prochaine-fete" className="mt-2 text-3xl text-night">
+                  {calendar.nextHoliday.title.replace(/^Horaires\s+/i, "")}
+                </h2>
+                <div className="mt-5">
+                  <ScheduleBlock occasion={calendar.nextHoliday} />
+                </div>
+              </section>
             )}
-          </section>
+
+            <section aria-labelledby="prochains-chabbat" className="rounded-xl border border-line bg-surface p-6 sm:p-8">
+              <h2 id="prochains-chabbat" className="text-3xl text-night">
+                Les semaines suivantes
+              </h2>
+              {following.length > 0 ? (
+                <table className="mt-5 w-full text-left">
+                  <thead className="text-sm text-ink-muted">
+                    <tr className="border-b border-line">
+                      <th scope="col" className="py-2 pr-3 font-semibold">
+                        Chabbat / fête
+                      </th>
+                      <th scope="col" className="px-3 py-2 text-right font-semibold">
+                        Allumage
+                      </th>
+                      <th scope="col" className="py-2 pl-3 text-right font-semibold">
+                        Fin
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line">
+                    {following.map((o) => {
+                      const s = summary(o);
+                      return (
+                        <tr key={o.key}>
+                          <th scope="row" className="py-3 pr-3 align-top font-normal">
+                            <span className="block font-semibold text-night">{formatDayShort(s.date)}</span>
+                            <span className="text-sm text-ink-muted">{s.name}</span>
+                          </th>
+                          <td className="px-3 py-3 text-right align-top font-semibold whitespace-nowrap text-night tabular-nums">
+                            {s.allumage}
+                          </td>
+                          <td className="py-3 pl-3 text-right align-top font-semibold whitespace-nowrap text-night tabular-nums">
+                            {s.fin}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <Unavailable />
+              )}
+            </section>
+          </div>
         </div>
 
         <section aria-labelledby="fetes">
@@ -132,10 +165,10 @@ export default async function HorairesPage() {
                           ))}
                         </div>
                         <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm sm:justify-end sm:text-right">
-                          {day.candles && <TimeItem label="Allumage">{<TimeValue entry={day.candles} />}</TimeItem>}
-                          {day.havdalah && <TimeItem label="Havdala">{<TimeValue entry={day.havdalah} />}</TimeItem>}
-                          {day.fastStart && <TimeItem label="Début du jeûne">{<IsoTime iso={day.fastStart} />}</TimeItem>}
-                          {day.fastEnd && <TimeItem label="Fin du jeûne">{<IsoTime iso={day.fastEnd} />}</TimeItem>}
+                          {day.allumage && <TimeItem label="Allumage 🕯">{day.allumage}</TimeItem>}
+                          {day.fin && <TimeItem label="Fin">{day.fin}</TimeItem>}
+                          {day.fastStart && <TimeItem label="Début du jeûne">{day.fastStart}</TimeItem>}
+                          {day.fastEnd && <TimeItem label="Fin du jeûne">{day.fastEnd}</TimeItem>}
                         </dl>
                       </li>
                     ))}
@@ -151,13 +184,14 @@ export default async function HorairesPage() {
         <aside className="rounded-xl bg-night-tint p-6 text-ink-muted">
           <p>
             Horaires calculés pour {settings.address.city} : allumage des bougies{" "}
-            <strong className="text-ink">{settings.candleMinutes} minutes avant le coucher du soleil</strong>, Havdala{" "}
+            <strong className="text-ink">{rules.candleMinutes} minutes avant le coucher du soleil</strong>, Fin{" "}
             <strong className="text-ink">
-              {settings.havdalahMinutes
-                ? `${settings.havdalahMinutes} minutes après le coucher du soleil`
+              {rules.havdalahMinutes
+                ? `${rules.havdalahMinutes} minutes après le coucher du soleil`
                 : "à la tombée de la nuit"}
+              {rules.endMarginMinutes > 0 && ` (+ ${rules.endMarginMinutes} min)`}
             </strong>
-            . Les heures marquées « ajusté » ont été fixées par le Beth Habad. Calculs :{" "}
+            . Le Beth Habad peut ajuster les horaires d&apos;une semaine. Calendrier :{" "}
             <a href="https://www.hebcal.com" className="underline underline-offset-4" rel="noopener">
               Hebcal
             </a>
@@ -173,16 +207,8 @@ function TimeItem({ label, children }: { label: string; children: React.ReactNod
   return (
     <div>
       <dt className="text-ink-muted">{label}</dt>
-      <dd className="text-base font-semibold text-night">{children}</dd>
+      <dd className="text-base font-semibold whitespace-nowrap text-night tabular-nums">{children}</dd>
     </div>
-  );
-}
-
-function IsoTime({ iso }: { iso: string }) {
-  return (
-    <time dateTime={timeAttr(iso)} className="tabular-nums">
-      {formatTime(iso)}
-    </time>
   );
 }
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/site.config";
 import {
@@ -12,7 +13,6 @@ import { DonateButton } from "@/components/layout/donate-button";
 import { ShabbatCard } from "@/components/shabbat/shabbat-card";
 import { EventListItem } from "@/components/events/event-list-item";
 import { RichText } from "@/components/ui/rich-text";
-import { HeroBackground } from "@/components/home/hero-background";
 import { CommunityMosaic } from "@/components/home/community-mosaic";
 import { ParallaxBand } from "@/components/home/parallax-band";
 import { photos } from "@/lib/community-photos";
@@ -47,7 +47,22 @@ export default async function HomePage() {
   return (
     <>
       <section className="relative isolate overflow-hidden bg-night text-white">
-        <HeroBackground image={photos.foule.src} />
+        {/* Photo de fond (LCP, préchargée) avec zoom lent, coupé en « réduire les animations ». */}
+        <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
+          <Image
+            src={photos.foule.src}
+            alt=""
+            fill
+            priority
+            fetchPriority="high"
+            placeholder="blur"
+            sizes="100vw"
+            quality={60}
+            className="ken-burns object-cover"
+          />
+          {/* Voile bleu de la charte : 88-90 % sous le texte, 65 % à droite sur grand écran. */}
+          <div className="absolute inset-0 bg-night/88 lg:bg-transparent lg:bg-linear-to-r lg:from-night/90 lg:from-50% lg:to-night/65" />
+        </div>
         <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gold" />
         <div className="mx-auto max-w-6xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-24">
           <p className="text-sm font-semibold tracking-[0.18em] text-gold-soft uppercase">
@@ -70,7 +85,7 @@ export default async function HomePage() {
 
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <ShabbatCard shabbat={calendar?.thisShabbat ?? null} />
+          <ShabbatCard occasion={calendar?.current ?? null} />
         </div>
 
         <section aria-labelledby="evenements-titre" className="rounded-xl border border-line bg-surface p-6 sm:p-8 lg:col-span-3">

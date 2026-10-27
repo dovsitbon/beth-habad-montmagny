@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 
 /** Étiquettes de cache du site public (voir src/lib/data et src/lib/hebcal.ts). */
-const TAGS = ["settings", "pages", "events", "courses", "albums", "announcements", "service_times", "shabbat_overrides", "hebcal"];
+const TAGS = ["settings", "pages", "events", "courses", "albums", "announcements", "service_times", "schedule_weeks", "hebcal"];
 
 /**
  * Remet le site public à jour après une modification faite directement dans la base

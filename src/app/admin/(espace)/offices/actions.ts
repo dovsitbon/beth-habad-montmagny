@@ -11,7 +11,7 @@ const schema = z
   .object({
     id: z.string().optional(),
     office: z.enum(["chaharit", "minha", "arvit"]),
-    dayType: z.enum(["semaine", "dimanche", "vendredi", "chabbat", "fete"]),
+    dayType: z.enum(["semaine", "dimanche", "fete"]),
     time: z.string().refine((v) => v === "" || timeField.test(v), "Heure invalide."),
     note: z.string().trim().max(160),
     sortOrder: z.coerce.number().int().min(0).max(99),

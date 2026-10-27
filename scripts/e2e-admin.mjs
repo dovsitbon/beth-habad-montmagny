@@ -59,8 +59,6 @@ async function saveAndWait(buttonName, urlPart) {
 const today = new Date();
 // Date AAAA-MM-JJ à l'heure de Paris (toISOString donnerait la veille entre minuit et 1 h/2 h).
 const isoDate = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
-const nextFriday = new Date(today);
-nextFriday.setDate(today.getDate() + ((5 - today.getDay() + 7) % 7 || 7));
 
 try {
   console.log("\nConnexion");
@@ -79,6 +77,7 @@ try {
     "/admin/annonces",
     "/admin/annonces/nouvelle",
     "/admin/offices",
+    "/admin/ce-chabbat",
     "/admin/horaires-chabbat",
     "/admin/cours",
     "/admin/cours/nouveau",
@@ -131,13 +130,28 @@ try {
   await saveAndWait("Ajouter", "/admin/offices?message=");
   check("le nouvel horaire apparaît sur /offices", (await publicText("/offices")).includes("[E2E] note"));
 
-  console.log("\nCorrection d'un horaire de Chabbat");
-  await go("/admin/horaires-chabbat");
-  await page.getByLabel("Date").fill(isoDate(nextFriday));
-  await page.getByLabel("Nouvelle heure").fill("17:00");
-  await page.getByLabel("Raison").fill("[E2E]");
-  await saveAndWait("Remplacer l'horaire", "message=enregistre");
-  check("l'horaire ajusté apparaît sur /horaires", (await publicText("/horaires")).includes("ajusté par le Beth Habad"));
+  console.log("\nCe Chabbat (horaires de la semaine, message WhatsApp)");
+  await go("/admin/ce-chabbat");
+  const before = await page.locator("pre").textContent();
+  check("le message commence par « HORAIRES »", before?.startsWith("HORAIRES "));
+  check("le message se termine par la formule finale", /Chabbat Chalom|Hag Saméa'h|Chana Tova|Gmar/.test(before ?? ""));
+  await page.getByLabel("Kidouch").fill("[E2E] Grand Kidouch 🍷 offert par la famille Test");
+  await page.getByLabel("Chaharit").first().fill("09:40");
+  await page.getByRole("button", { name: "Ajouter une ligne" }).click();
+  await page.getByLabel("Texte").fill("[E2E] Cours spécial");
+  await page.getByLabel("Heure").fill("16:00");
+  await saveAndWait("Enregistrer les horaires", "message=enregistre");
+  const after = await page.locator("pre").textContent();
+  check("le Kidouch apparaît dans le message WhatsApp", after?.includes("[E2E] Grand Kidouch 🍷 offert par la famille Test"));
+  check("l'heure modifiée apparaît dans le message (Chaharit: 9h40)", after?.includes("Chaharit: 9h40"));
+  check("la ligne ajoutée apparaît dans le message", after?.includes("[E2E] Cours spécial: 16h"));
+  const share = await page.getByRole("link", { name: "Partager sur WhatsApp" }).getAttribute("href");
+  check("« Partager sur WhatsApp » ouvre wa.me avec le message", share?.startsWith("https://wa.me/?text=HORAIRES"));
+  const home = await publicText("/");
+  check("le Kidouch apparaît dans « Ce Chabbat » sur l'accueil", home.includes("[E2E] Grand Kidouch"));
+  page.once("dialog", (d) => d.accept());
+  await Promise.all([page.waitForURL(/message=enregistre/), page.getByRole("button", { name: "Revenir au calcul automatique" }).click()]);
+  check("« Revenir au calcul » efface les changements", !(await page.locator("pre").textContent())?.includes("[E2E]"));
 
   console.log("\nÉvénement avec photo");
   await go("/admin/evenements/nouveau");
@@ -262,7 +276,7 @@ async function cleanup() {
   await service.from("courses").delete().like("title", "[E2E]%");
   await service.from("announcements").delete().like("message", "[E2E]%");
   await service.from("service_times").delete().like("note", "[E2E]%");
-  await service.from("shabbat_overrides").delete().eq("note", "[E2E]");
+  await service.from("schedule_weeks").delete().like("kidouch", "[E2E]%");
   await service.from("settings").update({ phone: null }).eq("id", 1);
 
   const { data: page } = await service.from("pages").select("body").eq("slug", "cours").single();

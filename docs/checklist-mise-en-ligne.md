@@ -29,9 +29,9 @@ Ce qu'il faut **demander au Beth Habad** et **faire techniquement** avant d'ouvr
 - [ ] Logo (fichier PNG ou SVG, fond transparent si possible), s'il y en a un
 
 ### Horaires
-- [ ] **Horaires des offices** : Chaharit, Minha, Arvit, en semaine, le dimanche, le vendredi soir, le Chabbat et les jours de fête
-- [ ] **Allumage des bougies** : combien de minutes avant le coucher du soleil ? (réglé par défaut sur **18 min**, à confirmer)
-- [ ] **Havdala** : tombée de la nuit (réglage par défaut) ou un nombre de minutes après le coucher ?
+- [ ] **Offices de la semaine** : Chaharit, Minha, Arvit, en semaine, le dimanche et les jours de fête
+- [x] **Horaires de Chabbat** au format du rabbin (allumage 17 min avant le coucher, Fin = nuit 8,5° + 1 min, Tania 8h30, Chaharit 9h15, Cours 17h, Minha 18h, Arvit Fin + 10 min) : repris de son message WhatsApp
+- [ ] **En hiver** : Minha fixe à 18h tombe après la Fin (vers 17h50 en décembre). Demander au rabbin s'il préfère « X minutes avant la Fin » (Règles de calcul des horaires)
 - [ ] Liste des cours et activités réguliers (jour, heure, intervenant, public, lieu)
 
 ### Mentions légales (obligatoires)

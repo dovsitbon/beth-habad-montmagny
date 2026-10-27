@@ -35,16 +35,27 @@ Depuis l'icône « Admin Beth Habad », si on vous demande un code, saisissez ce
 
 ---
 
-## 3. Changer les horaires
+## 3. Les horaires de Chabbat : la page « Ce Chabbat »
 
-**Horaires des offices** (Chaharit, Minha, Arvit) :
-1. Tableau de bord → **« Modifier les horaires des offices »**.
+Le site prépare chaque semaine **le même message que celui que vous envoyiez sur WhatsApp** : allumage, Minha suivi d'Arvit, Tania, Chaharit, Cours, Minha, Fin, Arvit, « Chabbat Chalom ». Les heures sont **calculées automatiquement**. Les fêtes (Roch Hachana, Kippour, Souccot, Pessa'h, Chavouot…) apparaissent dans la même page, au même format.
+
+1. Tableau de bord → **« Horaires de ce Chabbat »**.
+2. En haut, choisissez la semaine (ou la fête) si ce n'est pas la bonne.
+3. Changez seulement ce qui est différent cette semaine :
+   - une **heure** : touchez-la et corrigez-la (videz-la pour revenir au calcul) ;
+   - une ligne à **retirer** cette semaine : décochez « Afficher » ;
+   - le **Kidouch** : écrivez par exemple « Grand Kidouch 🍷 offert par la famille … ». Laissé vide, il n'apparaît pas ;
+   - une ligne en plus (cours spécial, office supplémentaire) : **« Ajouter une ligne »** ;
+   - une **note** libre, qui s'affiche avant « Chabbat Chalom ».
+4. **« Enregistrer les horaires »** : le site est à jour tout de suite.
+5. **« Copier le message WhatsApp »**, puis collez-le dans les groupes. Ou **« Partager sur WhatsApp »** pour l'envoyer directement.
+
+Rien à faire la semaine suivante : tout repart du calcul. Pour changer les heures **de toutes les semaines** (Chaharit à 9h, Minha 30 minutes avant la Fin en hiver…) : Menu → **« Règles de calcul des horaires »**.
+
+**Offices de la semaine** (dimanche, lundi au vendredi matin) :
+1. Menu → **« Offices de la semaine »**.
 2. Appuyez sur **« Modifier »** sous l'horaire, changez l'heure, **« Enregistrer »**.
 3. Pour une note générale (« Horaires d'été »), utilisez le champ tout en haut.
-
-**Horaires de Chabbat** (allumage, Havdala) : ils sont **calculés automatiquement**. Pour remplacer une heure exceptionnellement :
-1. Menu → **« Horaires de Chabbat »** → **« Remplacer un horaire »**.
-2. Choisissez la date (le vendredi pour l'allumage, le samedi pour la Havdala), l'heure, puis **« Remplacer l'horaire »**.
 
 ---
 

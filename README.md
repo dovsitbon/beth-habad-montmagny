@@ -152,8 +152,9 @@ Sans configuration, Supabase n'envoie les e-mails de connexion **qu'aux membres 
 
 ```bash
 npm run lint
-npm run test:rls   # 33 vérifications des règles de sécurité (visiteur, éditeur, serveur)
-npm run test:e2e   # 40 vérifications de l'admin dans Edge, format téléphone (serveur local requis)
+npm run test:horaires  # horaires au format du rabbin : son message du Chabbat Lekh Lekha au caractère près, fêtes, 60 parachiot
+npm run test:rls       # règles de sécurité (visiteur, éditeur, serveur)
+npm run test:e2e       # l'admin dans Edge, format téléphone (serveur local requis)
 ```
 
 Les tests créent puis suppriment leurs propres données (préfixées `[E2E]`) et leur compte de test.

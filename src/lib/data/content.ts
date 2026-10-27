@@ -1,6 +1,8 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/lib/supabase/database.types";
+import type { WeekAdjustments } from "@/lib/horaires/calcul";
+import { addDays, todayISO } from "@/lib/format";
 
 type Tables = Database["public"]["Tables"];
 export type Announcement = Tables["announcements"]["Row"];
@@ -54,16 +56,42 @@ export async function getPage(slug: string): Promise<Page | null> {
   return data;
 }
 
-export type ShabbatOverride = Tables["shabbat_overrides"]["Row"];
-
-export async function getShabbatOverrides(): Promise<ShabbatOverride[]> {
+/** Ajustements des semaines récentes et à venir (page « Ce Chabbat » de l'admin). */
+export async function getScheduleWeeks(): Promise<WeekAdjustments[]> {
   "use cache";
-  cacheTag("shabbat_overrides");
+  cacheTag("schedule_weeks");
   cacheLife("days");
 
-  const { data, error } = await createPublicClient().from("shabbat_overrides").select("*");
-  if (error) console.error("Lecture des corrections d'horaires impossible.", error);
-  return data ?? [];
+  const { data, error } = await createPublicClient()
+    .from("schedule_weeks")
+    .select("*")
+    .gte("date", addDays(todayISO(), -10));
+  // Avant la migration, la table n'existe pas encore : les horaires restent calculés.
+  if (error) console.error("Lecture des horaires de la semaine impossible.", error);
+  return (data ?? []).map(toWeekAdjustments);
+}
+
+/** Ligne de schedule_weeks → ajustements utilisés par le calcul (JSON vérifié). */
+export function toWeekAdjustments(row: Tables["schedule_weeks"]["Row"]): WeekAdjustments {
+  const times = row.times && typeof row.times === "object" && !Array.isArray(row.times) ? row.times : {};
+  const extras = Array.isArray(row.extra_lines) ? row.extra_lines : [];
+  return {
+    date: row.date,
+    title: row.title,
+    kidouch: row.kidouch,
+    note: row.note,
+    closing: row.closing,
+    times: Object.fromEntries(
+      Object.entries(times).filter((e): e is [string, string] => typeof e[1] === "string" && /^\d{2}:\d{2}$/.test(e[1])),
+    ),
+    hidden: row.hidden ?? [],
+    extra_lines: extras.flatMap((x) => {
+      if (!x || typeof x !== "object" || Array.isArray(x)) return [];
+      const { section, label, time } = x as Record<string, unknown>;
+      if (typeof section !== "string" || typeof label !== "string" || !label.trim()) return [];
+      return [{ section, label: label.trim(), time: typeof time === "string" && /^\d{2}:\d{2}$/.test(time) ? time : null }];
+    }),
+  };
 }
 
 /** Prochains événements publiés (toutes catégories ou une seule). */

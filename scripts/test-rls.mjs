@@ -110,6 +110,11 @@ async function main() {
     const settings = await anon.from("settings").select("name").single();
     check("peut lire les paramètres publics", !settings.error && !!settings.data?.name);
 
+    const weeks = await anon.from("schedule_weeks").select("date").limit(1);
+    check("peut lire les horaires de la semaine", !weeks.error);
+    const weekIns = await anon.from("schedule_weeks").insert({ date: "2098-12-30", kidouch: tag });
+    check("ne peut pas modifier les horaires de la semaine", !!weekIns.error);
+
     const upload = await anon.storage.from("media").upload(`${tag}.txt`, new Blob(["x"]), { contentType: "image/png" });
     check("ne peut pas envoyer de fichier", !!upload.error);
 
@@ -164,6 +169,11 @@ async function main() {
 
     const priv = await editor.from("settings_private").select("notification_email");
     check("peut lire les paramètres privés", !priv.error && priv.data.length === 1);
+
+    const week = await editor.from("schedule_weeks").upsert({ date: "2098-12-31", kidouch: tag, times: { "2099-01-01:fin": "19:40" } });
+    check("peut ajuster les horaires d'une semaine (page « Ce Chabbat »)", !week.error);
+    const weekDel = await editor.from("schedule_weeks").delete().eq("date", "2098-12-31").select();
+    check("peut effacer ces ajustements", !weekDel.error && weekDel.data.length === 1);
   }
 
   // --- Serveur (service_role) ------------------------------------------------
@@ -197,6 +207,7 @@ function future(days) {
 
 async function cleanup() {
   await service.from("events").delete().like("slug", `${tag}%`);
+  await service.from("schedule_weeks").delete().in("date", ["2098-12-30", "2098-12-31"]);
   if (editorId) await service.auth.admin.deleteUser(editorId);
 }
 
