@@ -8,6 +8,7 @@ import { refreshSite } from "@/lib/admin/revalidate";
 import { loadAdminOccasions } from "@/lib/admin/occasions";
 import { type ActionState, dateField, TECH_ERROR, timeField } from "@/lib/admin/helpers";
 import { hhmmToMinutes, type ExtraLine } from "@/lib/horaires/calcul";
+import { siteId } from "@/lib/supabase/env";
 
 const textSchema = z.object({
   title: z.string().trim().max(80, "80 caractères au maximum."),
@@ -105,8 +106,8 @@ export async function saveWeek(_prev: ActionState, form: FormData): Promise<Acti
 
   const supabase = await createSessionClient();
   const { error } = empty
-    ? await supabase.from("schedule_weeks").delete().eq("date", key)
-    : await supabase.from("schedule_weeks").upsert(row, { onConflict: "date" });
+    ? await supabase.from("schedule_weeks").delete().eq("site_id", siteId()).eq("date", key)
+    : await supabase.from("schedule_weeks").upsert({ site_id: siteId(), ...row }, { onConflict: "site_id,date" });
   if (error) {
     console.error("Enregistrement des horaires de la semaine impossible :", error);
     return TECH_ERROR;
@@ -121,7 +122,7 @@ export async function resetWeek(form: FormData) {
   const key = String(form.get("key") ?? "");
   if (!dateField.test(key)) return;
   const supabase = await createSessionClient();
-  await supabase.from("schedule_weeks").delete().eq("date", key);
+  await supabase.from("schedule_weeks").delete().eq("site_id", siteId()).eq("date", key);
   refreshSite("schedule_weeks", "hebcal");
   redirect(`/admin/ce-chabbat?semaine=${key}&message=recalcule`);
 }

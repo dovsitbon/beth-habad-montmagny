@@ -11,6 +11,7 @@ import { requireMember } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { Flash } from "@/components/admin/ui";
 import { ADMIN_SECTIONS } from "@/components/admin/shell";
+import { PushToggle } from "@/components/admin/push-toggle";
 
 // Page lue à chaque visite (session) : voir le commentaire dans (espace)/layout.tsx.
 export const instant = false;
@@ -45,6 +46,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/admin"
       <Flash code={message} />
       <h1 className="text-3xl text-night">Bonjour{firstName ? ` ${firstName}` : ""} !</h1>
       <p className="mt-1 text-ink-muted">Que voulez-vous faire ?</p>
+
+      <div className="mt-6">
+        <PushToggle />
+      </div>
 
       <ul className="mt-6 grid grid-cols-2 gap-3">
         {MAIN_ACTIONS.map(({ href, label, Icon }) => (

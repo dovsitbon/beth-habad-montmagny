@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin, requireMember } from "@/lib/auth";
 import { createServiceClient } from "@/lib/supabase/service";
+import { siteId } from "@/lib/supabase/env";
 import { sendNotification } from "@/lib/email";
 import { siteConfig } from "@/config/site.config";
 import { type ActionState, invalid, TECH_ERROR } from "@/lib/admin/helpers";
@@ -27,13 +28,26 @@ export async function inviteMember(_prev: ActionState, form: FormData): Promise<
   const { email, fullName } = parsed.data;
 
   // Création du compte : nécessite la clé serveur (les inscriptions publiques sont fermées).
+  // Un même compte peut gérer plusieurs sites : s'il existe déjà, on l'ajoute à l'équipe de ce site.
   const service = createServiceClient();
+  const site = siteId();
   const { data: existing } = await service.from("profiles").select("id").eq("email", email).maybeSingle();
-  if (existing) return { ok: false, fieldErrors: { email: "Cette personne fait déjà partie de l'équipe." } };
+  let userId = existing?.id;
+  if (userId) {
+    const { data: already } = await service.from("user_sites").select("role").eq("user_id", userId).eq("site_id", site).maybeSingle();
+    if (already) return { ok: false, fieldErrors: { email: "Cette personne fait déjà partie de l'équipe." } };
+  } else {
+    const { data, error } = await service.auth.admin.createUser({ email, email_confirm: true, user_metadata: { full_name: fullName } });
+    if (error || !data.user) {
+      console.error("Invitation impossible :", error);
+      return TECH_ERROR;
+    }
+    userId = data.user.id;
+  }
 
-  const { error } = await service.auth.admin.createUser({ email, email_confirm: true, user_metadata: { full_name: fullName } });
+  const { error } = await service.from("user_sites").insert({ user_id: userId, site_id: site, role: "editor" });
   if (error) {
-    console.error("Invitation impossible :", error);
+    console.error("Ajout à l'équipe impossible :", error);
     return TECH_ERROR;
   }
 
@@ -60,10 +74,15 @@ export async function removeMember(form: FormData) {
   if (id === me.id) redirect("/admin/equipe");
 
   const service = createServiceClient();
-  const { data: target } = await service.from("profiles").select("role").eq("id", id).maybeSingle();
+  const site = siteId();
+  const { data: target } = await service.from("user_sites").select("role").eq("user_id", id).eq("site_id", site).maybeSingle();
   if (!target || (target.role === "admin" && me.role !== "admin")) redirect("/admin/equipe?message=reserve-admin");
 
-  await service.auth.admin.deleteUser(id);
+  // Retrait de l'équipe de CE site ; le compte n'est supprimé que s'il ne gère plus aucun site.
+  await service.from("push_subscriptions").delete().eq("user_id", id).eq("site_id", site);
+  await service.from("user_sites").delete().eq("user_id", id).eq("site_id", site);
+  const { count } = await service.from("user_sites").select("site_id", { count: "exact", head: true }).eq("user_id", id);
+  if (count === 0) await service.auth.admin.deleteUser(id);
   redirect("/admin/equipe?message=supprime");
 }
 
@@ -73,6 +92,6 @@ export async function changeRole(form: FormData) {
   const role = form.get("role") === "admin" ? "admin" : "editor";
   if (id === me.id) redirect("/admin/equipe");
   const service = createServiceClient();
-  await service.from("profiles").update({ role }).eq("id", id);
+  await service.from("user_sites").update({ role }).eq("user_id", id).eq("site_id", siteId());
   redirect("/admin/equipe?message=enregistre");
 }

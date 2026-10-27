@@ -5,6 +5,7 @@ import { requireMember } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { refreshSite } from "@/lib/admin/revalidate";
 import { type ActionState, invalid, TECH_ERROR, timeField } from "@/lib/admin/helpers";
+import { siteId } from "@/lib/supabase/env";
 
 const minutes = (min: number, max: number) =>
   z.coerce
@@ -57,7 +58,7 @@ export async function saveShabbatRules(_prev: ActionState, form: FormData): Prom
       minha_before_end: v.minhaMode === "avant_fin" ? v.minhaBeforeEnd : null,
       arvit_after_end: v.arvitAfterEnd,
     })
-    .eq("id", 1);
+    .eq("site_id", siteId());
   if (error) {
     console.error("Enregistrement des règles de calcul impossible :", error);
     return TECH_ERROR;

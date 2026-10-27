@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
-import { supabaseEnv } from "./env";
+import { siteHeaders, supabaseEnv } from "./env";
 
 /**
  * Client anonyme sans cookies, pour les lectures des pages publiques.
@@ -15,6 +15,6 @@ export function createPublicClient() {
   const { url, publishableKey } = supabaseEnv();
   return createClient<Database>(url, publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }) },
+    global: { headers: siteHeaders(), fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }) },
   });
 }

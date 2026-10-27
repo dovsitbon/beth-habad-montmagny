@@ -4,9 +4,11 @@ import { updateTag } from "next/cache";
 import { z } from "zod";
 import { checkSpam } from "@/lib/anti-spam";
 import { sendNotification } from "@/lib/email";
+import { notifyTeam } from "@/lib/push";
 import { createServiceClient } from "@/lib/supabase/service";
 import { formatDateTimeLong } from "@/lib/format";
 import { siteConfig } from "@/config/site.config";
+import { siteId } from "@/lib/supabase/env";
 
 export type RegistrationState = {
   status: "idle" | "success" | "error";
@@ -105,27 +107,36 @@ export async function registerForEvent(_prev: RegistrationState, form: FormData)
 
   // Notification au Beth Habad (sans bloquer le visiteur si l'envoi échoue).
   const [{ data: event }, { data: priv }] = await Promise.all([
-    supabase.from("events").select("title, slug, starts_at").eq("id", eventId).single(),
-    supabase.from("settings_private").select("notification_email").eq("id", 1).single(),
+    supabase.from("events").select("title, slug, starts_at").eq("id", eventId).eq("site_id", siteId()).single(),
+    supabase.from("settings_private").select("notification_email").eq("site_id", siteId()).single(),
   ]);
-  if (event && priv?.notification_email) {
-    await sendNotification({
-      to: priv.notification_email,
-      replyTo: email || null,
-      subject: `Nouvelle inscription : ${event.title}`,
-      text: [
-        `Nouvelle inscription pour « ${event.title} » (${formatDateTimeLong(event.starts_at)}).`,
-        "",
-        `Nom : ${name}`,
-        `Nombre de personnes : ${partySize}`,
-        phone ? `Téléphone : ${phone}` : null,
-        email ? `E-mail : ${email}` : null,
-        "",
-        `Toutes les inscriptions : ${siteConfig.url}/admin/inscriptions`,
-      ]
-        .filter((l) => l !== null)
-        .join("\n"),
-    });
+  if (event) {
+    await Promise.all([
+      notifyTeam({
+        title: `Nouvelle inscription : ${event.title}`,
+        body: `${name} (${partySize > 1 ? `${partySize} personnes` : "1 personne"})`,
+        url: `/admin/inscriptions/${eventId}`,
+        tag: `inscriptions-${eventId}`,
+      }),
+      priv?.notification_email &&
+        sendNotification({
+          to: priv.notification_email,
+          replyTo: email || null,
+          subject: `Nouvelle inscription : ${event.title}`,
+          text: [
+            `Nouvelle inscription pour « ${event.title} » (${formatDateTimeLong(event.starts_at)}).`,
+            "",
+            `Nom : ${name}`,
+            `Nombre de personnes : ${partySize}`,
+            phone ? `Téléphone : ${phone}` : null,
+            email ? `E-mail : ${email}` : null,
+            "",
+            `Toutes les inscriptions : ${siteConfig.url}/admin/inscriptions`,
+          ]
+            .filter((l) => l !== null)
+            .join("\n"),
+        }),
+    ]);
   }
 
   return {

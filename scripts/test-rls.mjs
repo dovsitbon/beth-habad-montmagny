@@ -5,6 +5,9 @@
  *
  * Crée temporairement un compte « éditeur » de test et des événements de test,
  * puis supprime tout à la fin (même en cas d'échec).
+ *
+ * Multi-tenant : toutes les requêtes portent l'en-tête « x-site-id » du site de ce dépôt
+ * (NEXT_PUBLIC_SITE_ID), comme l'application. Un faux site (« intrus ») vérifie l'isolation.
  */
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
@@ -14,9 +17,13 @@ process.loadEnvFile(".env.local");
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const publishable = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const secret = process.env.SUPABASE_SECRET_KEY;
-const noSession = { auth: { persistSession: false, autoRefreshToken: false } };
+const SITE = process.env.NEXT_PUBLIC_SITE_ID;
+const OTHER_SITE = randomUUID();
+const forSite = (site) => ({ auth: { persistSession: false, autoRefreshToken: false }, global: { headers: { "x-site-id": site } } });
+const noSession = forSite(SITE);
 
 const anon = createClient(url, publishable, noSession);
+const anonOther = createClient(url, publishable, forSite(OTHER_SITE));
 const service = createClient(url, secret, noSession);
 
 let passed = 0;
@@ -45,6 +52,8 @@ async function main() {
   });
   if (createErr) throw createErr;
   editorId = created.user.id;
+  const { error: memberErr } = await service.from("user_sites").insert({ user_id: editorId, site_id: SITE, role: "editor" });
+  if (memberErr) throw memberErr;
 
   const { data: events, error: evErr } = await service
     .from("events")
@@ -115,8 +124,19 @@ async function main() {
     const weekIns = await anon.from("schedule_weeks").insert({ date: "2098-12-30", kidouch: tag });
     check("ne peut pas modifier les horaires de la semaine", !!weekIns.error);
 
+    const pushSub = { endpoint: `https://example.com/${tag}`, p256dh: "x", auth: "x" };
+    const pushRead = await anon.from("push_subscriptions").select("id");
+    check("ne voit aucun abonnement aux notifications", !!pushRead.error || pushRead.data.length === 0);
+    const pushIns = await anon.from("push_subscriptions").insert({ ...pushSub, user_id: "00000000-0000-0000-0000-000000000000" });
+    check("ne peut pas abonner un appareil aux notifications", !!pushIns.error);
+
     const upload = await anon.storage.from("media").upload(`${tag}.txt`, new Blob(["x"]), { contentType: "image/png" });
     check("ne peut pas envoyer de fichier", !!upload.error);
+
+    const otherSite = await anonOther.from("events").select("id").like("slug", `${tag}%`);
+    check("un autre site ne voit pas les événements de celui-ci", (otherSite.data ?? []).length === 0);
+    const otherSettings = await anonOther.from("settings").select("name");
+    check("un autre site ne lit pas les paramètres de celui-ci", (otherSettings.data ?? []).length === 0);
 
     const signup = await anon.auth.signUp({ email: `${tag}-intrus@example.com`, password });
     check("ne peut pas se créer de compte (invitation uniquement)", !!signup.error);
@@ -128,22 +148,22 @@ async function main() {
   const { error: signErr } = await editor.auth.signInWithPassword({ email, password });
   if (signErr) throw signErr;
   {
-    const { data: profile } = await editor.from("profiles").select("role").eq("id", editorId).single();
-    check("a le rôle éditeur par défaut", profile?.role === "editor");
+    const { data: membership } = await editor.from("user_sites").select("role").eq("user_id", editorId).eq("site_id", SITE).single();
+    check("est éditeur de ce site", membership?.role === "editor");
 
     const { data } = await editor.from("events").select("slug").like("slug", `${tag}%`);
     check("voit aussi les brouillons", (data ?? []).some((e) => e.slug === `${tag}-draft`));
 
-    const role = await editor.from("profiles").update({ role: "admin" }).eq("id", editorId);
-    check("ne peut pas se promouvoir admin", !!role.error);
+    const role = await editor.from("user_sites").update({ role: "admin" }).eq("user_id", editorId).select();
+    check("ne peut pas se promouvoir admin", !!role.error || role.data.length === 0);
 
     const name = await editor.from("profiles").update({ full_name: "Test" }).eq("id", editorId);
     check("peut modifier son propre nom", !name.error);
 
-    const { data: before } = await service.from("settings").select("phone, color_primary").single();
-    const phone = await editor.from("settings").update({ phone: before.phone }).eq("id", 1);
+    const { data: before } = await service.from("settings").select("phone, color_primary").eq("site_id", SITE).single();
+    const phone = await editor.from("settings").update({ phone: before.phone }).eq("site_id", SITE);
     check("peut modifier le téléphone", !phone.error);
-    const color = await editor.from("settings").update({ color_primary: "#FF0000" }).eq("id", 1);
+    const color = await editor.from("settings").update({ color_primary: "#FF0000" }).eq("site_id", SITE);
     check("ne peut pas modifier les couleurs (réservé à l'admin)", !!color.error);
 
     const ev = await editor
@@ -174,6 +194,26 @@ async function main() {
     check("peut ajuster les horaires d'une semaine (page « Ce Chabbat »)", !week.error);
     const weekDel = await editor.from("schedule_weeks").delete().eq("date", "2098-12-31").select();
     check("peut effacer ces ajustements", !weekDel.error && weekDel.data.length === 1);
+
+    const others = await service.from("push_subscriptions").insert({ user_id: (await service.from("profiles").select("id").neq("id", editorId).limit(1).single()).data.id, endpoint: `https://example.com/${tag}-autre`, p256dh: "x", auth: "x" });
+    const mine = await editor.from("push_subscriptions").insert({ user_id: editorId, endpoint: `https://example.com/${tag}`, p256dh: "x", auth: "x" });
+    check("peut abonner son téléphone aux notifications", !mine.error, mine.error?.message);
+    const seen = await editor.from("push_subscriptions").select("endpoint");
+    check("ne voit que ses propres appareils", !others.error && !seen.error && seen.data.every((r) => r.endpoint === `https://example.com/${tag}`));
+    const steal = await editor.from("push_subscriptions").insert({ user_id: (await service.from("profiles").select("id").neq("id", editorId).limit(1).single()).data.id, endpoint: `https://example.com/${tag}-vol`, p256dh: "x", auth: "x" });
+    check("ne peut pas abonner l'appareil de quelqu'un d'autre", !!steal.error);
+    const delOther = await editor.from("push_subscriptions").delete().eq("endpoint", `https://example.com/${tag}-autre`).select();
+    check("ne peut pas désabonner l'appareil de quelqu'un d'autre", (delOther.data ?? []).length === 0);
+
+    // Isolation : le même compte, en demandant un autre site, n'a plus aucun droit d'équipe.
+    const intruder = createClient(url, publishable, forSite(OTHER_SITE));
+    await intruder.auth.signInWithPassword({ email, password });
+    const msgOther = await intruder.from("contact_messages").select("id");
+    check("sur un autre site : ne lit aucun message", (msgOther.data ?? []).length === 0);
+    const evOther = await intruder.from("events").select("id").like("slug", `${tag}%`);
+    check("sur un autre site : ne voit pas les événements de celui-ci", (evOther.data ?? []).length === 0);
+    const insOther = await intruder.from("events").insert({ slug: `${tag}-intrus`, title: "Intrus", starts_at: future(2) });
+    check("sur un autre site : ne peut rien créer", !!insOther.error);
   }
 
   // --- Serveur (service_role) ------------------------------------------------
@@ -208,6 +248,7 @@ function future(days) {
 async function cleanup() {
   await service.from("events").delete().like("slug", `${tag}%`);
   await service.from("schedule_weeks").delete().in("date", ["2098-12-30", "2098-12-31"]);
+  await service.from("push_subscriptions").delete().like("endpoint", `https://example.com/${tag}%`);
   if (editorId) await service.auth.admin.deleteUser(editorId);
 }
 

@@ -6,21 +6,26 @@
 -- * Événements, cours, horaires, annonce : données d'EXEMPLE, toutes préfixées
 --   « [EXEMPLE] », à supprimer depuis l'admin avant la mise en ligne.
 -- Ce script peut être relancé : il n'écrase rien d'existant.
+-- Multi-tenant : tout est rattaché au site Beth Habad Montmagny · Groslay (créé par la
+-- migration multi_tenant). Le site est fixé ici comme s'il venait de l'application
+-- (en-tête « x-site-id ») : les colonnes site_id prennent cette valeur par défaut.
 -- =============================================================================
 
+select set_config('request.headers', '{"x-site-id": "dba8f5e4-8708-4700-bbae-11cd22048338"}', false);
+
 insert into public.settings (
-  id, name, short_name, address_street, address_postal_code, address_city,
+  name, short_name, address_street, address_postal_code, address_city,
   latitude, longitude, email, phone, whatsapp, candle_minutes, end_margin_minutes, color_primary, color_accent
 ) values (
-  1, 'Centre communautaire Beth Habad Montmagny · Groslay', 'Beth Habad Montmagny · Groslay',
+  'Centre communautaire Beth Habad Montmagny · Groslay', 'Beth Habad Montmagny · Groslay',
   '4 bis, chemin de la Haie Barde', '95360', 'Montmagny',
   -- Allumage 17 min avant le coucher, Fin = nuit (8,5°) + 1 min : les horaires du rabbin.
   48.976809, 2.346422, 'mikelsitbon@gmail.com', '06 12 83 38 48', '33612833848', 17, 1, '#17418B', '#CCAB5A'
-) on conflict (id) do nothing;
+) on conflict (site_id) do nothing;
 
-insert into public.settings_private (id, notification_email)
-values (1, 'mikelsitbon@gmail.com')
-on conflict (id) do nothing;
+insert into public.settings_private (notification_email)
+values ('mikelsitbon@gmail.com')
+on conflict (site_id) do nothing;
 
 insert into public.pages (slug, title, body) values
   ('accueil', 'Présentation (page d''accueil)',
@@ -85,7 +90,7 @@ Base de données et photos hébergées par Supabase, sur des serveurs situés en
 <p>Vous pouvez demander à consulter, corriger ou supprimer vos données, ou vous opposer à leur utilisation, en écrivant au Beth Habad (page <a href="/contact">Contact</a>). Si vous estimez que vos droits ne sont pas respectés, vous pouvez saisir la CNIL (cnil.fr).</p>
 
 <p>Dernière mise à jour : [À COMPLÉTER]</p>$tpl$)
-on conflict (slug) do nothing;
+on conflict (site_id, slug) do nothing;
 
 -- ----------------------------------------------------------------------------
 -- EXEMPLES (à supprimer avant la mise en ligne)

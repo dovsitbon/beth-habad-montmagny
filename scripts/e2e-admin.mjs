@@ -12,8 +12,10 @@ import { createClient } from "@supabase/supabase-js";
 
 process.loadEnvFile(".env.local");
 const BASE = process.env.E2E_BASE_URL ?? "http://localhost:3000";
+const SITE = process.env.NEXT_PUBLIC_SITE_ID;
 const service = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, {
   auth: { persistSession: false },
+  global: { headers: { "x-site-id": SITE } },
 });
 
 let passed = 0;
@@ -36,6 +38,11 @@ const { data: testUser, error: testUserError } = await service.auth.admin.create
   user_metadata: { full_name: "Éditeur Test" },
 });
 if (testUserError && !/already/i.test(testUserError.message)) throw testUserError;
+// Membre de l'équipe de ce site (multi-tenant).
+{
+  const { data: profile } = await service.from("profiles").select("id").eq("email", process.env.TEST_EDITOR_EMAIL).single();
+  await service.from("user_sites").upsert({ user_id: profile.id, site_id: SITE, role: "editor" }, { onConflict: "user_id,site_id" });
+}
 
 const browser = await chromium.launch({ channel: "msedge", headless: true });
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: "fr-FR", isMobile: true, hasTouch: true });
@@ -61,7 +68,7 @@ const today = new Date();
 const isoDate = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
 
 // Le test change le téléphone : on remet ensuite le vrai numéro du Beth Habad.
-const { data: originalSettings } = await service.from("settings").select("phone").eq("id", 1).single();
+const { data: originalSettings } = await service.from("settings").select("phone").eq("site_id", SITE).single();
 
 try {
   console.log("\nConnexion");
@@ -281,7 +288,7 @@ async function cleanup() {
   await service.from("announcements").delete().like("message", "[E2E]%");
   await service.from("service_times").delete().like("note", "[E2E]%");
   await service.from("schedule_weeks").delete().like("kidouch", "[E2E]%");
-  await service.from("settings").update({ phone: originalSettings?.phone ?? null }).eq("id", 1);
+  await service.from("settings").update({ phone: originalSettings?.phone ?? null }).eq("site_id", SITE);
 
   const { data: page } = await service.from("pages").select("body").eq("slug", "cours").single();
   if (page?.body.includes("[E2E]")) {

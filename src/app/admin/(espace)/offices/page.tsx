@@ -7,6 +7,7 @@ import { ActionButton } from "@/components/admin/fields";
 import { ServicesNoteForm, ServiceTimeForm } from "@/components/admin/service-forms";
 import { DAY_OPTIONS, OFFICE_OPTIONS } from "@/components/admin/service-options";
 import { trashServiceTime } from "./actions";
+import { siteId } from "@/lib/supabase/env";
 
 export const instant = false;
 export const metadata = { title: "Horaires des offices" };
@@ -17,7 +18,7 @@ export default async function AdminOfficesPage({ searchParams }: PageProps<"/adm
   const supabase = await createSessionClient();
   const [{ data: rows }, { data: settings }] = await Promise.all([
     supabase.from("service_times").select("*").is("deleted_at", null).order("sort_order").order("time", { nullsFirst: false }),
-    supabase.from("settings").select("services_note").eq("id", 1).single(),
+    supabase.from("settings").select("services_note").eq("site_id", siteId()).single(),
   ]);
   const officeLabel = Object.fromEntries(OFFICE_OPTIONS.map((o) => [o.value, o.label]));
 

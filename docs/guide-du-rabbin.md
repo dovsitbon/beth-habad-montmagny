@@ -85,6 +85,13 @@ Les photos sont automatiquement allégées : pas besoin de les réduire avant.
 - **« Voir les inscriptions »** : la liste par événement, le nombre total de personnes, **« Télécharger (Excel) »** et **« Partager sur WhatsApp »**.
 - **« Voir les messages »** : les messages du formulaire de contact, avec les boutons **Répondre**, **Appeler** ou **WhatsApp**.
 
+**Être prévenu sur le téléphone** à chaque nouveau message ou inscription :
+1. iPhone : ouvrez l'admin **depuis l'icône de l'écran d'accueil** (voir la partie 1), sinon l'iPhone ne permet pas les notifications.
+2. En haut du tableau de bord, appuyez sur **« Activer les notifications »**, puis sur **« Autoriser »**.
+3. Une notification d'essai arrive aussitôt. En la touchant, vous arrivez sur le message ou l'inscription.
+
+À faire sur chaque téléphone qui doit être prévenu. **« Désactiver »** les arrête sur ce téléphone.
+
 ---
 
 ## Bon à savoir

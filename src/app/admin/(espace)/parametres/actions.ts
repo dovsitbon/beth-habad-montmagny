@@ -5,6 +5,7 @@ import { requireAdmin, requireMember } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { refreshSite } from "@/lib/admin/revalidate";
 import { type ActionState, invalid, TECH_ERROR } from "@/lib/admin/helpers";
+import { siteId } from "@/lib/supabase/env";
 
 const url = (label: string) =>
   z
@@ -86,8 +87,8 @@ export async function saveSettings(_prev: ActionState, form: FormData): Promise<
         donation_url: v.donationUrl || null,
         social,
       })
-      .eq("id", 1),
-    supabase.from("settings_private").update({ notification_email: v.notificationEmail }).eq("id", 1),
+      .eq("site_id", siteId()),
+    supabase.from("settings_private").update({ notification_email: v.notificationEmail }).eq("site_id", siteId()),
   ]);
   if (a.error || b.error) {
     console.error("Enregistrement des paramètres impossible :", a.error ?? b.error);
@@ -129,7 +130,7 @@ export async function saveAdminSettings(_prev: ActionState, form: FormData): Pro
       longitude: v.longitude,
       logo_path: v.logoPath || null,
     })
-    .eq("id", 1);
+    .eq("site_id", siteId());
   if (error) {
     console.error("Enregistrement des paramètres techniques impossible :", error);
     return TECH_ERROR;

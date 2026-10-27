@@ -3,6 +3,7 @@ import { createSessionClient } from "@/lib/supabase/server";
 import { mediaUrl } from "@/lib/format";
 import { AdminPage } from "@/components/admin/ui";
 import { AdminSettingsForm, SettingsForm } from "@/components/admin/settings-forms";
+import { siteId } from "@/lib/supabase/env";
 
 export const instant = false;
 export const metadata = { title: "Paramètres" };
@@ -17,8 +18,8 @@ export default async function SettingsPage() {
   const member = await requireMember();
   const supabase = await createSessionClient();
   const [{ data: s }, { data: priv }] = await Promise.all([
-    supabase.from("settings").select("*").eq("id", 1).single(),
-    supabase.from("settings_private").select("notification_email").eq("id", 1).single(),
+    supabase.from("settings").select("*").eq("site_id", siteId()).single(),
+    supabase.from("settings_private").select("notification_email").eq("site_id", siteId()).single(),
   ]);
   if (!s) throw new Error("Paramètres introuvables");
   const social = (s.social ?? {}) as Record<string, string>;

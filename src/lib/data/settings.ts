@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { siteConfig } from "@/config/site.config";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { ScheduleRules } from "@/lib/horaires/calcul";
+import { siteId } from "@/lib/supabase/env";
 
 export type SiteSettings = {
   name: string;
@@ -73,7 +74,7 @@ export async function getSettings(): Promise<SiteSettings> {
   cacheTag("settings");
   cacheLife("days");
 
-  const { data, error } = await createPublicClient().from("settings").select("*").eq("id", 1).maybeSingle();
+  const { data, error } = await createPublicClient().from("settings").select("*").eq("site_id", siteId()).maybeSingle();
   if (error || !data) {
     console.error("Lecture des paramètres impossible, valeurs par défaut utilisées.", error);
     return fallback();

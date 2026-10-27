@@ -2,7 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "./database.types";
-import { supabaseEnv } from "./env";
+import { siteHeaders, supabaseEnv } from "./env";
 
 /**
  * Client lié à la session de la personne connectée (admin, Server Actions).
@@ -13,6 +13,7 @@ export async function createSessionClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(url, publishableKey, {
+    global: { headers: siteHeaders() },
     cookies: {
       getAll() {
         return cookieStore.getAll();

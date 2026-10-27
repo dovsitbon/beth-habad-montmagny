@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       albums: {
         Row: {
+          site_id: string
           album_date: string | null
           cover_photo_id: string | null
           created_at: string
@@ -29,6 +30,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          site_id?: string
           album_date?: string | null
           cover_photo_id?: string | null
           created_at?: string
@@ -42,6 +44,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          site_id?: string
           album_date?: string | null
           cover_photo_id?: string | null
           created_at?: string
@@ -73,6 +76,7 @@ export type Database = {
       }
       announcements: {
         Row: {
+          site_id: string
           created_at: string
           deleted_at: string | null
           expires_at: string | null
@@ -86,6 +90,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          site_id?: string
           created_at?: string
           deleted_at?: string | null
           expires_at?: string | null
@@ -99,6 +104,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          site_id?: string
           created_at?: string
           deleted_at?: string | null
           expires_at?: string | null
@@ -115,6 +121,7 @@ export type Database = {
       }
       contact_messages: {
         Row: {
+          site_id: string
           created_at: string
           deleted_at: string | null
           email: string | null
@@ -125,6 +132,7 @@ export type Database = {
           read_at: string | null
         }
         Insert: {
+          site_id?: string
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -135,6 +143,7 @@ export type Database = {
           read_at?: string | null
         }
         Update: {
+          site_id?: string
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -148,6 +157,7 @@ export type Database = {
       }
       courses: {
         Row: {
+          site_id: string
           audience: Database["public"]["Enums"]["course_audience"]
           created_at: string
           day_of_week: number | null
@@ -166,6 +176,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          site_id?: string
           audience?: Database["public"]["Enums"]["course_audience"]
           created_at?: string
           day_of_week?: number | null
@@ -184,6 +195,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          site_id?: string
           audience?: Database["public"]["Enums"]["course_audience"]
           created_at?: string
           day_of_week?: number | null
@@ -205,6 +217,7 @@ export type Database = {
       }
       events: {
         Row: {
+          site_id: string
           capacity: number | null
           category: Database["public"]["Enums"]["event_category"]
           created_at: string
@@ -225,6 +238,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          site_id?: string
           capacity?: number | null
           category?: Database["public"]["Enums"]["event_category"]
           created_at?: string
@@ -245,6 +259,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          site_id?: string
           capacity?: number | null
           category?: Database["public"]["Enums"]["event_category"]
           created_at?: string
@@ -268,6 +283,7 @@ export type Database = {
       }
       pages: {
         Row: {
+          site_id: string
           body: string
           image_path: string | null
           slug: string
@@ -275,6 +291,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          site_id?: string
           body?: string
           image_path?: string | null
           slug: string
@@ -282,6 +299,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          site_id?: string
           body?: string
           image_path?: string | null
           slug?: string
@@ -292,6 +310,7 @@ export type Database = {
       }
       photos: {
         Row: {
+          site_id: string
           album_id: string
           caption: string | null
           created_at: string
@@ -302,6 +321,7 @@ export type Database = {
           width: number | null
         }
         Insert: {
+          site_id?: string
           album_id: string
           caption?: string | null
           created_at?: string
@@ -312,6 +332,7 @@ export type Database = {
           width?: number | null
         }
         Update: {
+          site_id?: string
           album_id?: string
           caption?: string | null
           created_at?: string
@@ -337,7 +358,6 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
-          role: Database["public"]["Enums"]["app_role"]
           updated_at: string
         }
         Insert: {
@@ -345,7 +365,6 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
-          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
         Update: {
@@ -353,23 +372,66 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
         Relationships: []
       }
+      push_subscriptions: {
+        Row: {
+          site_id: string
+          auth: string
+          created_at: string
+          device: string | null
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          site_id?: string
+          auth: string
+          created_at?: string
+          device?: string | null
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          site_id?: string
+          auth?: string
+          created_at?: string
+          device?: string | null
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
+          site_id: string
           created_at: string
           id: number
           key: string
         }
         Insert: {
+          site_id?: string
           created_at?: string
           id?: never
           key: string
         }
         Update: {
+          site_id?: string
           created_at?: string
           id?: never
           key?: string
@@ -378,6 +440,7 @@ export type Database = {
       }
       registrations: {
         Row: {
+          site_id: string
           created_at: string
           email: string | null
           event_id: string
@@ -387,6 +450,7 @@ export type Database = {
           phone: string | null
         }
         Insert: {
+          site_id?: string
           created_at?: string
           email?: string | null
           event_id: string
@@ -396,6 +460,7 @@ export type Database = {
           phone?: string | null
         }
         Update: {
+          site_id?: string
           created_at?: string
           email?: string | null
           event_id?: string
@@ -416,6 +481,7 @@ export type Database = {
       }
       service_times: {
         Row: {
+          site_id: string
           created_at: string
           day_type: Database["public"]["Enums"]["service_day"]
           deleted_at: string | null
@@ -427,6 +493,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          site_id?: string
           created_at?: string
           day_type: Database["public"]["Enums"]["service_day"]
           deleted_at?: string | null
@@ -438,6 +505,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          site_id?: string
           created_at?: string
           day_type?: Database["public"]["Enums"]["service_day"]
           deleted_at?: string | null
@@ -450,8 +518,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sites: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
+          site_id: string
           address_city: string | null
           address_postal_code: string | null
           address_street: string | null
@@ -468,7 +558,6 @@ export type Database = {
           friday_minha_offset: number
           friday_minha_rounding: number
           havdalah_minutes: number | null
-          id: number
           latitude: number
           logo_path: string | null
           longitude: number
@@ -485,6 +574,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          site_id?: string
           address_city?: string | null
           address_postal_code?: string | null
           address_street?: string | null
@@ -501,7 +591,6 @@ export type Database = {
           friday_minha_offset?: number
           friday_minha_rounding?: number
           havdalah_minutes?: number | null
-          id?: number
           latitude: number
           logo_path?: string | null
           longitude: number
@@ -518,6 +607,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          site_id?: string
           address_city?: string | null
           address_postal_code?: string | null
           address_street?: string | null
@@ -534,7 +624,6 @@ export type Database = {
           friday_minha_offset?: number
           friday_minha_rounding?: number
           havdalah_minutes?: number | null
-          id?: number
           latitude?: number
           logo_path?: string | null
           longitude?: number
@@ -554,17 +643,17 @@ export type Database = {
       }
       settings_private: {
         Row: {
-          id: number
+          site_id: string
           notification_email: string
           updated_at: string
         }
         Insert: {
-          id?: number
+          site_id?: string
           notification_email: string
           updated_at?: string
         }
         Update: {
-          id?: number
+          site_id?: string
           notification_email?: string
           updated_at?: string
         }
@@ -572,6 +661,7 @@ export type Database = {
       }
       schedule_weeks: {
         Row: {
+          site_id: string
           closing: string | null
           date: string
           extra_lines: Json
@@ -583,6 +673,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          site_id?: string
           closing?: string | null
           date: string
           extra_lines?: Json
@@ -594,6 +685,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          site_id?: string
           closing?: string | null
           date?: string
           extra_lines?: Json
@@ -605,6 +697,42 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      user_sites: {
+        Row: {
+          created_at: string
+          role: Database["public"]["Enums"]["app_role"]
+          site_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          site_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          site_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sites_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_sites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

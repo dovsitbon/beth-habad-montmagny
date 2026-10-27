@@ -3,8 +3,10 @@
 import { z } from "zod";
 import { checkSpam } from "@/lib/anti-spam";
 import { sendNotification } from "@/lib/email";
+import { excerpt, notifyTeam } from "@/lib/push";
 import { createServiceClient } from "@/lib/supabase/service";
 import { siteConfig } from "@/config/site.config";
+import { siteId } from "@/lib/supabase/env";
 
 export type ContactState = {
   status: "idle" | "success" | "error";
@@ -71,7 +73,7 @@ export async function sendContactMessage(_prev: ContactState, form: FormData): P
   const supabase = createServiceClient();
   const { error } = await supabase
     .from("contact_messages")
-    .insert({ name, email: email || null, phone: phone || null, message });
+    .insert({ site_id: siteId(), name, email: email || null, phone: phone || null, message });
 
   if (error) {
     console.error("Enregistrement du message impossible :", error);
@@ -82,27 +84,29 @@ export async function sendContactMessage(_prev: ContactState, form: FormData): P
     };
   }
 
-  const { data: priv } = await supabase.from("settings_private").select("notification_email").eq("id", 1).single();
-  if (priv?.notification_email) {
-    await sendNotification({
-      to: priv.notification_email,
-      replyTo: email || null,
-      subject: `Nouveau message de ${name}`,
-      text: [
-        `Nouveau message reçu depuis le formulaire de contact du site.`,
-        "",
-        `De : ${name}`,
-        email ? `E-mail : ${email}` : null,
-        phone ? `Téléphone : ${phone}` : null,
-        "",
-        message,
-        "",
-        `Tous les messages : ${siteConfig.url}/admin/messages`,
-      ]
-        .filter((l) => l !== null)
-        .join("\n"),
-    });
-  }
+  const { data: priv } = await supabase.from("settings_private").select("notification_email").eq("site_id", siteId()).single();
+  await Promise.all([
+    notifyTeam({ title: `Nouveau message de ${name}`, body: excerpt(message), url: "/admin/messages", tag: "messages" }),
+    priv?.notification_email &&
+      sendNotification({
+        to: priv.notification_email,
+        replyTo: email || null,
+        subject: `Nouveau message de ${name}`,
+        text: [
+          `Nouveau message reçu depuis le formulaire de contact du site.`,
+          "",
+          `De : ${name}`,
+          email ? `E-mail : ${email}` : null,
+          phone ? `Téléphone : ${phone}` : null,
+          "",
+          message,
+          "",
+          `Tous les messages : ${siteConfig.url}/admin/messages`,
+        ]
+          .filter((l) => l !== null)
+          .join("\n"),
+      }),
+  ]);
 
   return { status: "success", message: `Merci ${name}, votre message a bien été envoyé. Nous vous répondrons rapidement.` };
 }

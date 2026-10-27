@@ -78,16 +78,19 @@ npm run dev                  # http://localhost:3000
 
 ## Créer le projet Supabase
 
-Avec le CLI (inclus dans les dépendances de développement) :
+**On ne crée pas de nouveau projet Supabase par site.** Tous les sites partagent un seul projet
+(`cqoisssgvkvnovpzrugz`, organisation « Sites Beth Habad »), en multi-tenant : chaque donnée porte un
+`site_id` et la RLS isole les sites entre eux. Voir [docs/multi-tenant.md](docs/multi-tenant.md).
+
+Pour relier un dépôt au projet partagé :
 
 ```bash
 npx supabase login
-npx supabase orgs list                         # repérer l'identifiant de l'organisation
-npx supabase projects create beth-habad-<ville> --org-id <org-id> --region eu-west-3 --db-password "<mot de passe fort>"
-npx supabase link --project-ref <project-ref> -p "<mot de passe>"
+npx supabase link --project-ref cqoisssgvkvnovpzrugz -p "<mot de passe de la base>"
 ```
 
-Puis récupérer les clés : `npx supabase projects api-keys --project-ref <project-ref> --reveal` (utiliser la clé **publishable** et la clé **secret**).
+Clés : `npx supabase projects api-keys --project-ref cqoisssgvkvnovpzrugz --reveal` (clé **publishable** et clé **secret**, identiques pour tous les sites).
+Un nouveau site se crée dans ce projet avec `node scripts/creer-site.mjs` (voir [Dupliquer le site](#dupliquer-le-site-pour-un-autre-beth-habad)).
 
 Réglages d'authentification (fichier `supabase/config.toml`, envoyés avec `npx supabase config push`) :
 
@@ -102,12 +105,14 @@ Voir [.env.example](.env.example). À renseigner dans `.env.local` (local) et da
 | Variable | Rôle |
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | Adresse publique du site, sans `/` final (sitemap, liens, e-mails) |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL du projet Supabase |
+| `NEXT_PUBLIC_SITE_ID` | Identifiant de ce site dans la table `sites` (multi-tenant) |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL du projet Supabase (le même pour tous les sites) |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clé publique (protégée par la RLS) |
 | `SUPABASE_SECRET_KEY` | Clé secrète, **serveur uniquement** (formulaires publics, invitations, purge) |
 | `CRON_SECRET` | Secret de la tâche planifiée `/api/cron/purge` (Vercel l'envoie automatiquement) |
 | `RATE_LIMIT_SALT` | Sel pour hacher les adresses IP (anti-spam) |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Envoi des notifications (inscriptions, messages, invitations) |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Notifications sur le téléphone de l'équipe (Web Push) |
 | `TEST_EDITOR_EMAIL`, `TEST_EDITOR_PASSWORD` | Tests de bout en bout uniquement (jamais en production) |
 
 Ne jamais committer `.env.local` (il est ignoré par git).
@@ -115,12 +120,16 @@ Ne jamais committer `.env.local` (il est ignoré par git).
 ## Migrations SQL et données d'exemple
 
 ```bash
-npx supabase db push --linked --include-seed
+npm run test:db             # rejoue toutes les migrations en mémoire et vérifie l'isolation entre sites
+npx supabase db push --linked
 npm run db:types            # régénère src/lib/supabase/database.types.ts
 ```
 
+Les migrations sont communes à tous les sites (un seul projet) : `--include-seed` ne sert que pour une base vide.
+
 - `supabase/migrations/…_schema.sql` : tables, RLS, fonctions (inscription avec contrôle des places, limitation de débit), bucket `media`.
 - `supabase/migrations/…_purge.sql` : purge (corbeille > 30 jours, inscriptions 6 mois après l'événement, messages après 2 ans).
+- `supabase/migrations/…_multi_tenant.sql` : table `sites`, équipes par site (`user_sites`), `site_id` partout, RLS par site, photos rangées par site.
 - `supabase/seed.sql` : paramètres, textes des pages (`[À COMPLÉTER]`) et contenus **[EXEMPLE]** à supprimer avant la mise en ligne.
 
 ## Créer le compte administrateur
@@ -162,10 +171,16 @@ Les tests créent puis suppriment leurs propres données (préfixées `[E2E]`) e
 
 ## Dupliquer le site pour un autre Beth Habad
 
-1. Copier le dépôt (ou utiliser GitHub « Use this template »).
-2. Modifier [src/config/site.config.ts](src/config/site.config.ts) : nom, ville, adresse, coordonnées GPS, e-mail, couleurs.
-3. Adapter `supabase/seed.sql` (paramètres de départ) et les modèles de `supabase/templates/` (mentions légales, confidentialité).
-4. Créer un nouveau projet Supabase, appliquer les migrations, créer l'admin, puis un nouveau projet Vercel.
+Le nouveau site utilise le **même projet Supabase** (multi-tenant, [docs/multi-tenant.md](docs/multi-tenant.md)) : pas de nouvel abonnement.
+
+1. Créer le site dans la base partagée (rien n'est modifié pour les autres sites) :
+   ```bash
+   node scripts/creer-site.mjs --nom "Beth Habad de <ville>" --domaine <domaine> --lat <latitude> --lng <longitude> --admin <e-mail du rabbin>
+   ```
+   Le script affiche le `NEXT_PUBLIC_SITE_ID` du nouveau site.
+2. Copier le dépôt (ou utiliser GitHub « Use this template »).
+3. Modifier [src/config/site.config.ts](src/config/site.config.ts) : nom, ville, adresse, coordonnées GPS, e-mail, couleurs.
+4. `.env.local` et Vercel : mêmes variables Supabase, nouveau `NEXT_PUBLIC_SITE_ID` et `NEXT_PUBLIC_SITE_URL`. Puis nouveau projet Vercel.
 5. Tout le reste (textes, horaires, logo, couleurs, liens) se règle ensuite **dans l'admin**.
 
 ## Fonctionnement : points importants

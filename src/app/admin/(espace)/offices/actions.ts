@@ -6,6 +6,7 @@ import { requireMember } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
 import { refreshSite } from "@/lib/admin/revalidate";
 import { type ActionState, invalid, TECH_ERROR, timeField } from "@/lib/admin/helpers";
+import { siteId } from "@/lib/supabase/env";
 
 const schema = z
   .object({
@@ -59,7 +60,7 @@ export async function saveServicesNote(_prev: ActionState, form: FormData): Prom
   await requireMember();
   const note = String(form.get("note") ?? "").trim().slice(0, 200);
   const supabase = await createSessionClient();
-  const { error } = await supabase.from("settings").update({ services_note: note || null }).eq("id", 1);
+  const { error } = await supabase.from("settings").update({ services_note: note || null }).eq("site_id", siteId());
   if (error) return TECH_ERROR;
   refreshSite("settings");
   return { ok: true, message: note ? "La note est affichée sur la page des offices." : "La note a été retirée." };

@@ -2,6 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createSessionClient } from "@/lib/supabase/server";
+import { siteId } from "@/lib/supabase/env";
 
 export type Member = {
   id: string;
@@ -22,13 +23,17 @@ export async function getMember(): Promise<Member | null> {
   const userId = data?.claims?.sub;
   if (!userId) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, email, full_name, role")
-    .eq("id", userId)
+  // Le rôle est celui tenu sur CE site : sans ligne dans user_sites, pas d'accès à cet admin
+  // (même avec un compte membre d'un autre site du même projet Supabase).
+  const { data: membership } = await supabase
+    .from("user_sites")
+    .select("role, profiles(id, email, full_name)")
+    .eq("user_id", userId)
+    .eq("site_id", siteId())
     .maybeSingle();
-  if (!profile) return null;
-  return { id: profile.id, email: profile.email, fullName: profile.full_name, role: profile.role };
+  const profile = membership?.profiles;
+  if (!membership || !profile) return null;
+  return { id: profile.id, email: profile.email, fullName: profile.full_name, role: membership.role };
 }
 
 /** À appeler en tête de chaque page et action de l'admin : renvoie vers la connexion si besoin. */

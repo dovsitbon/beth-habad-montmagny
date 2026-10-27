@@ -2,6 +2,7 @@
 
 import imageCompression from "browser-image-compression";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
+import { siteId } from "@/lib/supabase/env";
 
 /**
  * Compresse une photo dans le navigateur (format WebP, 2000 px max) puis l'envoie
@@ -24,7 +25,8 @@ export async function compressAndUpload(
   });
 
   const { width, height } = await imageSize(compressed);
-  const path = `${folder}/${crypto.randomUUID()}.webp`;
+  // Arborescence multi-tenant : {site_id}/{catégorie}/{fichier} (la base refuse tout autre dossier).
+  const path = `${siteId()}/${folder}/${crypto.randomUUID()}.webp`;
   const { error } = await createBrowserSupabase()
     .storage.from("media")
     .upload(path, compressed, { contentType: "image/webp", cacheControl: "31536000" });

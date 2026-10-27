@@ -1,5 +1,6 @@
 import { requireMember } from "@/lib/auth";
 import { createSessionClient } from "@/lib/supabase/server";
+import { siteId } from "@/lib/supabase/env";
 import { AdminPage, Flash, StatusBadge } from "@/components/admin/ui";
 import { ActionButton } from "@/components/admin/fields";
 import { InviteForm } from "@/components/admin/invite-form";
@@ -12,7 +13,12 @@ export default async function TeamPage({ searchParams }: PageProps<"/admin/equip
   const me = await requireMember();
   const { message } = await searchParams;
   const supabase = await createSessionClient();
-  const { data: members } = await supabase.from("profiles").select("*").order("created_at");
+  const { data: rows } = await supabase
+    .from("user_sites")
+    .select("role, created_at, profiles(id, email, full_name)")
+    .eq("site_id", siteId())
+    .order("created_at");
+  const members = (rows ?? []).flatMap((r) => (r.profiles ? [{ ...r.profiles, role: r.role }] : []));
 
   return (
     <AdminPage title="Équipe">
