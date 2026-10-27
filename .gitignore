@@ -49,3 +49,4 @@ e2e-erreur.png
 
 .vercel
 .env*
+!.env.example

@@ -6,7 +6,7 @@
 
 ## 1. Se connecter (pas de mot de passe)
 
-1. Ouvrez **[adresse du site]/admin** sur votre téléphone.
+1. Ouvrez **https://beth-habad-montmagny.vercel.app/admin** (adresse provisoire, en attendant le nom de domaine) sur votre téléphone.
 2. Tapez votre adresse e-mail, puis appuyez sur **« Recevoir mon lien de connexion »**.
 3. Ouvrez l'e-mail reçu et appuyez sur **« Me connecter »**. C'est tout.
 
