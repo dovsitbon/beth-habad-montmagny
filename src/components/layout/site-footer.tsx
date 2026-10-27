@@ -134,7 +134,7 @@ export async function SiteFooter() {
                 Politique de confidentialité
               </Link>
             </li>
-            </li>
+            
           </ul>
         </div>
       </div>
