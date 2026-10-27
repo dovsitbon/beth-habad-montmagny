@@ -16,7 +16,7 @@ export default async function AdminGalleryPage({ searchParams }: PageProps<"/adm
   const supabase = await createSessionClient();
   const { data: albums } = await supabase
     .from("albums")
-    .select("id, title, album_date, status, cover_photo_id, photos!photos_album_id_fkey(id, storage_path, sort_order)")
+    .select("id, title, album_date, status, cover_photo_id, photos!photos_album_fkey(id, storage_path, sort_order)")
     .is("deleted_at", null)
     .order("album_date", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });

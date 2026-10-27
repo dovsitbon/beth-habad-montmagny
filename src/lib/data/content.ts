@@ -191,7 +191,7 @@ export async function getAlbums(): Promise<Album[]> {
 
   const { data, error } = await createPublicClient()
     .from("albums")
-    .select("*, photos!photos_album_id_fkey(storage_path, width, height, sort_order, id)")
+    .select("*, photos!photos_album_fkey(storage_path, width, height, sort_order, id)")
     .order("album_date", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
   if (error) console.error("Lecture des albums impossible.", error);
