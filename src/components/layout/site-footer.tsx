@@ -96,9 +96,21 @@ export async function SiteFooter() {
           <p className="text-sm font-semibold tracking-[0.14em] text-gold uppercase">Informations</p>
           <ul className="mt-4 space-y-1">
             <li>
-              <Link href="/faire-un-don" className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
-                Faire un don
-              </Link>
+              {settings.donationUrl ? (
+                <a
+                  href={settings.donationUrl}
+                  target="_blank"
+                  rel="noopener"
+                  className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline"
+                >
+                  Faire un don
+                  <span className="sr-only"> (ouvre le site Allodons dans un nouvel onglet)</span>
+                </a>
+              ) : (
+                <Link href="/faire-un-don" className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
+                  Faire un don
+                </Link>
+              )}
             </li>
             <li>
               <Link href="/mentions-legales" className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">

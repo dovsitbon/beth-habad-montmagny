@@ -100,7 +100,7 @@ export function AdminSettingsForm({
   return (
     <AdminForm action={action} pending={pending}>
       <FormMessage state={state} />
-      <ImageField name="logoPath" label="Logo" folder="settings" defaultPath={values.logoPath} publicBaseUrl={mediaBaseUrl} hint="Remplace le nom écrit en haut du site." />
+      <ImageField name="logoPath" label="Logo" folder="settings" defaultPath={values.logoPath} publicBaseUrl={mediaBaseUrl} hint="Emblème affiché à gauche du nom, en haut du site (de préférence sur fond transparent)." />
       <div className="grid grid-cols-2 gap-4">
         <TextField label="Couleur principale (bleu nuit)" name="colorPrimary" type="color" required defaultValue={values.colorPrimary} error={e.colorPrimary} className="[&_input]:h-14" />
         <TextField label="Couleur d'accent (or)" name="colorAccent" type="color" required defaultValue={values.colorAccent} error={e.colorAccent} className="[&_input]:h-14" />

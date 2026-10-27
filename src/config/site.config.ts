@@ -51,7 +51,7 @@ export const siteConfig = {
   },
 
   /** Lien Allodons pour les dons. `null` tant qu'il n'a pas été fourni. */
-  donationUrl: null as string | null,
+  donationUrl: "https://www.allodons.fr/mikve-maayane-montmagny" as string | null,
 
   /** Couleurs de la charte (modifiables ensuite par l'admin). */
   colors: {

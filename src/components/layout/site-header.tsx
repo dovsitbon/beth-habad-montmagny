@@ -28,26 +28,25 @@ export async function SiteHeader() {
       </div>
 
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:h-20">
-        <Link href="/" className="group mr-auto flex flex-col leading-none">
-          {settings.logoPath ? (
-            // Logo envoyé depuis les paramètres de l'admin.
+        <Link href="/" className="group mr-auto flex items-center gap-3">
+          {/* Emblème envoyé depuis les paramètres de l'admin, à gauche du nom. */}
+          {settings.logoPath && (
             <Image
               src={mediaUrl(settings.logoPath)}
-              alt={settings.name}
-              width={180}
-              height={56}
+              alt=""
+              width={108}
+              height={101}
               priority
-              className="h-11 w-auto object-contain lg:h-14"
+              className="h-10 w-auto shrink-0 lg:h-12"
             />
-          ) : (
-            <>
-              <span className="font-serif text-xl font-semibold whitespace-nowrap text-night sm:text-2xl">Beth Habad</span>
-              <span className="mt-1 text-xs font-semibold tracking-[0.18em] text-gold-ink uppercase">
-                {settings.address.city}
-              </span>
-              <span className="sr-only">, retour à l&apos;accueil</span>
-            </>
           )}
+          <span className="flex flex-col leading-none">
+            <span className="font-serif text-xl font-semibold whitespace-nowrap text-night sm:text-2xl">Beth Habad</span>
+            <span className="mt-1 text-xs font-semibold tracking-[0.18em] text-gold-ink uppercase">
+              {settings.address.city}
+            </span>
+          </span>
+          <span className="sr-only">, retour à l&apos;accueil</span>
         </Link>
 
         <nav aria-label="Navigation principale" className="hidden xl:block">
