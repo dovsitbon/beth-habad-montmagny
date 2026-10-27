@@ -18,7 +18,7 @@ function canPlayVideo() {
 /**
  * Fond de la bannière d'accueil.
  * La photo (préchargée, prioritaire, placeholder flou) s'affiche tout de suite et porte le LCP.
- * La vidéo n'est ajoutée qu'une fois la page entièrement chargée, pour ne rien ralentir,
+ * La vidéo n'est ajoutée qu'une fois la page entièrement chargée (+ 2 s), pour ne rien ralentir,
  * puis apparaît en fondu quand elle joue : la photo lui sert d'affiche en attendant
  * (d'où l'absence d'attribut poster, qui resterait invisible).
  * En « réduire les animations » ou sur connexion lente : photo seule, avec un zoom lent
@@ -30,13 +30,18 @@ export function HeroBackground({ image }: { image: StaticImageData }) {
 
   useEffect(() => {
     if (!canPlayVideo()) return;
-    const start = () => setWithVideo(true);
-    if (document.readyState === "complete") {
-      const timer = setTimeout(start, 0);
-      return () => clearTimeout(timer);
-    }
-    window.addEventListener("load", start, { once: true });
-    return () => window.removeEventListener("load", start);
+    // 2 s après le chargement complet : la vidéo (1,6 Mo) ne concurrence ni la photo,
+    // ni les autres images, ni le préchargement des pages par Next.js.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const start = () => {
+      timer = setTimeout(() => setWithVideo(true), 2000);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => {
+      window.removeEventListener("load", start);
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
