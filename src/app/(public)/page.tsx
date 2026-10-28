@@ -42,7 +42,7 @@ export default async function HomePage() {
   const next = upcoming[0];
 
   return (
-    <div className="px-3 pt-3 sm:px-4 sm:pt-4">
+    <div data-home className="px-3 pt-3 sm:px-4 sm:pt-4">
       {/* Espaces insécables : « Montmagny · Groslay » ne se coupe pas. */}
       <HeroCarousel
         slides={SLIDES}

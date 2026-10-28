@@ -149,6 +149,12 @@ html {
   }
 }
 
+/* Sur l'accueil, la carte « Aujourd'hui » affiche déjà les horaires du bandeau, en plus grand.
+   En CSS plutôt qu'avec usePathname : le gabarit est rendu sans connaître la page (pas d'écart à l'hydratation). */
+body:has([data-home]) .schedule-bar {
+  display: none;
+}
+
 /* ── Accueil ──────────────────────────────────────────────────────────── */
 
 /* Carte blanche arrondie à ombre douce : le « bloc » de base du site. */

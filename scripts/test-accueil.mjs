@@ -56,7 +56,7 @@ async function homeAt(date) {
   const text = await page.locator("main").innerText();
   // Bloc principal : la carte « Aujourd'hui » ou les horaires de Chabbat en grand (après la bannière photo).
   const first = await page.locator('main section[aria-labelledby="aujourdhui"], main section[aria-labelledby^="horaires-"]').first().innerText();
-  const homeBanner = await page.locator('section[aria-label="Offices du jour"], section[aria-label="Horaires de Chabbat"]').count();
+  const homeBanner = await page.locator('section[aria-label="Offices du jour"], section[aria-label="Horaires de Chabbat"]').isVisible();
   await page.goto(`${BASE}/contact`, { waitUntil: "networkidle" });
   await page.waitForTimeout(300);
   const bar = page.locator('section[aria-label="Offices du jour"], section[aria-label="Horaires de Chabbat"]');
@@ -72,7 +72,7 @@ const isToday = (r) => /AUJOURD'HUI/i.test(r.first) && /DEMAIN/i.test(r.first) &
 check(`jeudi ${thursday} à 22h → carte « Aujourd'hui / Demain »`, isToday(jeudi), jeudi.first);
 check("jeudi 22h : « Demain : Chaharit à 8h15 »", /Demain\s*:\s*Chaharit à 8h15/i.test(jeudi.first));
 check("jeudi : ligne « Chabbat … Allumage … Fin … » vers /horaires", /Chabbat \S+.*\sAllumage avant \d+h\d*\s*·\s*Fin \d+h\d*/.test(jeudi.first.replace(/\s+/g, " ")));
-check("pas de bandeau d'horaires sur l'accueil (la carte le remplace)", jeudi.homeBanner === 0);
+check("pas de bandeau d'horaires sur l'accueil (la carte le remplace)", jeudi.homeBanner === false);
 
 const jeudiSoir = await homeAt(paris(thursday, "20:00"));
 check(`bandeau jeudi ${thursday} à 20h → offices du jour (« Aujourd'hui · Chaharit 8h15 … »)`, jeudiSoir.banner?.label === "Offices du jour" && /^Aujourd'hui · Chaharit 8h15/.test(jeudiSoir.banner.text));

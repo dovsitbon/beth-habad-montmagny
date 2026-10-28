@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ClockIcon } from "@phosphor-icons/react";
 import { bandeauAt, type Bandeau, type HomeWindow, type OfficeRow } from "@/lib/horaires/bandeau";
 import { useNowSnapshot } from "@/components/shabbat/use-now-snapshot";
@@ -15,14 +14,12 @@ type Props = { windows: HomeWindow[]; offices: OfficeRow[]; computedAt: number; 
 export function ScheduleBar({ windows, offices, computedAt, timeZone }: Props) {
   const state = useNowSnapshot((now) => JSON.stringify(bandeauAt(windows, offices, now, timeZone)), computedAt);
   const bandeau = JSON.parse(state) as Bandeau | null;
-  // Sur l'accueil, la carte « Aujourd'hui » affiche déjà ces horaires, en plus grand.
-  const home = usePathname() === "/";
-  if (!bandeau || home) return null;
+  if (!bandeau) return null;
 
   const chabbat = bandeau.kind === "chabbat";
   const [first, ...rest] = chabbat ? bandeau.parts : [bandeau.day, ...bandeau.parts];
   return (
-    <section aria-label={chabbat ? "Horaires de Chabbat" : "Offices du jour"} className="mx-auto mt-3 w-full max-w-6xl px-3 sm:px-4">
+    <section aria-label={chabbat ? "Horaires de Chabbat" : "Offices du jour"} className="schedule-bar mx-auto mt-3 w-full max-w-6xl px-3 sm:px-4">
       <Link
         href={chabbat ? "/horaires" : "/offices"}
         className="flex items-start gap-2.5 rounded-2xl bg-gold-tint px-4 py-2.5 text-[0.95rem] leading-snug text-ink ring-1 ring-gold/40 hover:underline sm:items-center sm:px-5"
