@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 /*
- * Charte : bleu et or du logo, fond papier chaud.
+ * Charte : bleu et or du logo, fond crème chaleureux, cartes blanches très arrondies
+ * à ombre douce, boutons en pilule.
  * Les deux couleurs de marque (--brand-primary, --brand-accent) peuvent être
  * remplacées à l'exécution depuis les paramètres (style inline sur <html>) :
  * toutes les nuances en dérivent via color-mix().
@@ -10,11 +11,12 @@
   --brand-primary: #17418b;
   --brand-accent: #ccab5a;
 
-  --canvas: #faf7f0;
+  --canvas: #f6f1e7;
   --surface: #ffffff;
   --ink: #18213a;
-  --ink-muted: #545d70;
-  --line: #e7e0d0;
+  /* Gris lisible sur le crème comme sur le blanc (contraste > 4.5:1). */
+  --ink-muted: #525a6b;
+  --line: #e6dcc8;
 
   color-scheme: light;
 }
@@ -37,9 +39,16 @@
   --color-gold-soft: color-mix(in oklab, var(--brand-accent) 70%, white);
   --color-gold-tint: color-mix(in oklab, var(--brand-accent) 14%, white);
 
+  /* Vert WhatsApp assombri : icône blanche lisible (contraste > 4.5:1). */
+  --color-whatsapp: #187a46;
+
   /* Repère [À COMPLÉTER] */
   --color-todo: #fbf0cc;
   --color-todo-ink: #7a5300;
+
+  /* Ombres douces des cartes (teintées de bleu, jamais grises). */
+  --shadow-soft: 0 1px 2px rgb(23 33 58 / 0.04), 0 8px 24px -6px rgb(23 33 58 / 0.1);
+  --shadow-lift: 0 2px 4px rgb(23 33 58 / 0.05), 0 18px 40px -12px rgb(23 33 58 / 0.22);
 
   --font-serif: var(--font-frank-ruhl), "Frank Ruhl Libre", Georgia, serif;
   --font-sans: var(--font-assistant), "Assistant", system-ui, sans-serif;
@@ -58,17 +67,20 @@ body {
   line-height: 1.6;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-serif);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-}
+/* En couche « base » : les classes utilitaires (font-sans…) peuvent les remplacer. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
 
-p {
-  text-wrap: pretty;
+  p {
+    text-wrap: pretty;
+  }
 }
 
 /* Textes saisis dans l'admin */
@@ -137,52 +149,31 @@ html {
   }
 }
 
-/* ── Photos de l'accueil ─────────────────────────────────────────────── */
+/* ── Accueil ──────────────────────────────────────────────────────────── */
 
-/* Mosaïque : la légende apparaît au survol sur ordinateur ; toujours visible au doigt. */
-.mosaic-tile img {
-  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-@media (hover: hover) {
-  .mosaic-caption {
-    opacity: 0;
-    translate: 0 0.5rem;
-    transition:
-      opacity 0.3s ease,
-      translate 0.3s ease;
-  }
-  .mosaic-tile:hover .mosaic-caption {
-    opacity: 1;
-    translate: 0 0;
-  }
-}
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .mosaic-tile:hover img {
-    transform: scale(1.05);
-  }
+/* Carte blanche arrondie à ombre douce : le « bloc » de base du site. */
+@utility card {
+  background: var(--surface);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-soft);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Bannière d'accueil : zoom très lent sur la photo (Ken Burns). */
+  /* Bannière : zoom très lent sur la photo affichée (Ken Burns). */
   .ken-burns {
-    animation: ken-burns 40s ease-in-out infinite alternate;
+    animation: ken-burns 30s ease-in-out infinite alternate;
   }
-
-  /* Effets liés au défilement, sans JavaScript ; ignorés par les navigateurs qui ne les gèrent pas. */
-  @supports (animation-timeline: view()) {
-    /* Apparition douce des photos (fondu + léger glissement). */
-    .reveal {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 70%;
+  /* Barre de progression du carrousel. */
+  .carousel-progress {
+    animation: carousel-progress linear forwards;
+  }
+  /* Photos de la galerie : léger zoom au survol. */
+  @media (hover: hover) {
+    .photo-card img {
+      transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
     }
-
-    /* Parallaxe du bandeau, sur tablette et ordinateur seulement. */
-    @media (min-width: 768px) {
-      .parallax {
-        animation: parallax linear both;
-        animation-timeline: view();
-      }
+    .photo-card:hover img {
+      transform: scale(1.05);
     }
   }
 }
@@ -192,20 +183,14 @@ html {
     transform: scale(1);
   }
   to {
-    transform: scale(1.1) translate(-1%, -1%);
+    transform: scale(1.08) translate(-1%, -1%);
   }
 }
-@keyframes reveal {
+@keyframes carousel-progress {
   from {
-    opacity: 0;
-    translate: 0 1.5rem;
-  }
-}
-@keyframes parallax {
-  from {
-    translate: 0 -12%;
+    transform: scaleX(0);
   }
   to {
-    translate: 0 12%;
+    transform: scaleX(1);
   }
 }

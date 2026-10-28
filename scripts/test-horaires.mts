@@ -15,6 +15,7 @@ import {
 } from "../src/lib/horaires/calcul.ts";
 import { parashaFr } from "../src/lib/horaires/noms.ts";
 import { bandeauAt, toHomeWindow, type OfficeRow } from "../src/lib/horaires/bandeau.ts";
+import { inDelay, occasionDayRows, todayView } from "../src/lib/horaires/aujourdhui.ts";
 
 const place = { latitude: 48.976809, longitude: 2.346422 };
 const timeZone = "Europe/Paris";
@@ -182,6 +183,35 @@ check(
 check("samedi 24/10 à 20h → toujours Chabbat (Arvit 19h43 + 30 min)", bandeau("2026-10-24T20:00:00+02:00").startsWith("Chabbat Lekh Lekha"));
 check("samedi 24/10 à 23h → offices du jour (ceux de demain dimanche)", bandeau("2026-10-24T23:00:00+02:00") === "Demain · Chaharit 9h");
 check("dimanche 25/10 à 10h → Chaharit 9h", bandeau("2026-10-25T10:00:00+01:00") === "Aujourd'hui · Chaharit 9h");
+
+// ---------------------------------------------------------------------------
+console.log("\nCarte « Aujourd'hui » de l'accueil");
+const todayInput = { offices, ...occasionDayRows([occasionOf(octobre, "2026-10-23")]) };
+const view = (parisIso: string) => todayView(todayInput, Date.parse(parisIso), timeZone);
+const cols = (v: ReturnType<typeof view>) =>
+  [v.today.rows, v.tomorrow.rows].map((rows) => rows.map((r) => `${r.label} ${r.value}`).join(", "));
+{
+  const v = view("2026-10-22T17:45:00+02:00");
+  check("jeudi 17h45 → prochain office : Minha à 18h30, dans 45 min", v.next?.label === "Minha" && v.next.value === "18h30" && v.next.inMinutes === 45);
+  check("inDelay : « dans 45 min », « dans 2 h », « dans 2 h 05 »", inDelay(45) === "dans 45 min" && inDelay(120) === "dans 2 h" && inDelay(125) === "dans 2 h 05");
+  const [today, tomorrow] = cols(v);
+  check("jeudi : aujourd'hui = offices de la semaine", today === "Chaharit 8h15, Minha 18h30, Arvit 18h45", today);
+  check(
+    "jeudi : demain (veille de Chabbat) = Chaharit, puis allumage et office du soir calculés",
+    tomorrow === "Chaharit 8h15, Allumage avant 18h28, Minha suivi d'Arvit 18h30",
+    tomorrow,
+  );
+}
+{
+  const v = view("2026-10-22T21:00:00+02:00");
+  check("jeudi 21h → « Demain : Chaharit à 8h15 », sans délai", v.next?.day === "tomorrow" && v.next.label === "Chaharit" && v.next.inMinutes === null);
+}
+{
+  const v = view("2026-10-23T07:00:00+02:00");
+  const [, samedi] = cols(v);
+  check("vendredi 7h : demain samedi = horaires de Chabbat calculés", samedi.startsWith("Tania 8h30, Chaharit 9h15") && samedi.includes("Fin 19h33"), samedi);
+}
+check("samedi 23h → demain dimanche : Chaharit 9h", cols(view("2026-10-24T23:00:00+02:00"))[1] === "Chaharit 9h");
 
 // ---------------------------------------------------------------------------
 console.log("\nParachiot");

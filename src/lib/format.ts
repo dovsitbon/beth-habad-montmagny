@@ -163,3 +163,13 @@ export function telHref(phone: string): string {
 export function whatsappHref(number: string): string {
   return `https://wa.me/${number.replace(/\D/g, "")}`;
 }
+
+/** Itinéraire Google Maps vers une adresse (ouvre l'application sur téléphone). */
+export function directionsUrl(address: string): string {
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+}
+
+/** Itinéraire Waze vers des coordonnées GPS. */
+export function wazeUrl(latitude: number, longitude: number): string {
+  return `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`;
+}

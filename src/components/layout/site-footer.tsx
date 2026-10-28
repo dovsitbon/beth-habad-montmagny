@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   EnvelopeSimpleIcon,
@@ -9,107 +10,73 @@ import {
   YoutubeLogoIcon,
 } from "@phosphor-icons/react/ssr";
 import { mainNav } from "@/config/site.config";
-import { Todo } from "@/components/ui/todo";
 import { getSettings } from "@/lib/data/settings";
-import { telHref, whatsappHref } from "@/lib/format";
+import { directionsUrl, mediaUrl, telHref, whatsappHref } from "@/lib/format";
 
+const link = "inline-block py-1.5 underline-offset-4 hover:text-white hover:underline";
+
+/** Pied de page bleu nuit : identité et réseaux, plan du site, contact, liens légaux. */
 export async function SiteFooter() {
   const settings = await getSettings();
   const { address } = settings;
-  const contact = { phone: settings.phone, email: settings.email, whatsapp: settings.whatsapp };
+  const fullAddress = [address.street, address.postalCode, address.city].filter(Boolean).join(", ");
+
+  // Seuls les réseaux renseignés dans l'admin apparaissent.
+  const networks = [
+    settings.whatsapp && { href: whatsappHref(settings.whatsapp), label: "WhatsApp", Icon: WhatsappLogoIcon },
+    settings.social.instagram && { href: settings.social.instagram, label: "Instagram", Icon: InstagramLogoIcon },
+    settings.social.facebook && { href: settings.social.facebook, label: "Facebook", Icon: FacebookLogoIcon },
+    settings.social.youtube && { href: settings.social.youtube, label: "YouTube", Icon: YoutubeLogoIcon },
+  ].filter((n): n is { href: string; label: string; Icon: typeof WhatsappLogoIcon } => Boolean(n));
 
   return (
-    <footer className="mt-auto bg-night-deep text-white/85">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
+    <footer className="mt-auto bg-night-deep text-white/80">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 pt-14 pb-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <p className="font-serif text-2xl text-white">{settings.name}</p>
-          <div className="mt-4 h-px w-12 bg-gold" aria-hidden />
-          <address className="mt-4 space-y-3 not-italic">
-            <p className="flex gap-3">
-              <MapPinIcon aria-hidden weight="bold" className="mt-1 size-5 shrink-0 text-gold" />
-              <span>
-                {address.street}
-                <br />
-                {address.postalCode} {address.city}
+          <Link href="/" className="inline-flex items-center gap-3">
+            {settings.logoPath && (
+              <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl bg-white p-2 shadow-sm">
+                <Image src={mediaUrl(settings.logoPath)} alt="" width={108} height={101} className="h-auto w-full" />
               </span>
-            </p>
-            <p className="flex gap-3">
-              <PhoneIcon aria-hidden weight="bold" className="mt-1 size-5 shrink-0 text-gold" />
-              {contact.phone ? (
-                <a href={telHref(contact.phone)} className="underline-offset-4 hover:underline">
-                  {contact.phone}
-                </a>
-              ) : (
-                <span>
-                  Téléphone <Todo />
-                </span>
-              )}
-            </p>
-            {contact.email && (
-              <p className="flex gap-3">
-                <EnvelopeSimpleIcon aria-hidden weight="bold" className="mt-1 size-5 shrink-0 text-gold" />
-                <a href={`mailto:${contact.email}`} className="break-all underline-offset-4 hover:underline">
-                  {contact.email}
-                </a>
-              </p>
             )}
-          </address>
-          {contact.whatsapp && (
-            <a
-              href={whatsappHref(contact.whatsapp)}
-              target="_blank"
-              rel="noopener"
-              className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[#1F7A4D] px-5 font-bold text-white transition-colors hover:bg-[#186640]"
-            >
-              <WhatsappLogoIcon aria-hidden weight="fill" className="size-6" />
-              Écrire sur WhatsApp
-              <span className="sr-only">(ouvre WhatsApp dans un nouvel onglet)</span>
-            </a>
-          )}
-          {Object.keys(settings.social).length > 0 && (
+            <span className="font-serif text-xl leading-tight font-black text-white">{settings.shortName}</span>
+          </Link>
+          <p className="mt-4 max-w-xs">
+            {address.street}
+            <br />
+            {address.postalCode} {address.city}
+          </p>
+          {networks.length > 0 && (
             <ul className="mt-5 flex gap-2" aria-label="Réseaux sociaux">
-              {(
-                [
-                  ["facebook", "Facebook", FacebookLogoIcon],
-                  ["instagram", "Instagram", InstagramLogoIcon],
-                  ["youtube", "YouTube", YoutubeLogoIcon],
-                ] as const
-              ).map(([key, label, Icon]) =>
-                settings.social[key] ? (
-                  <li key={key}>
-                    <a
-                      href={settings.social[key]}
-                      target="_blank"
-                      rel="noopener"
-                      className="inline-flex size-11 items-center justify-center rounded-full border border-white/20 hover:bg-white/10"
-                    >
-                      <Icon aria-hidden weight="fill" className="size-5 text-gold" />
-                      <span className="sr-only">{label}</span>
-                    </a>
-                  </li>
-                ) : null,
-              )}
+              {networks.map(({ href, label, Icon }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener"
+                    className="inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-gold hover:text-night-deep"
+                  >
+                    <Icon aria-hidden weight="fill" className="size-5" />
+                    <span className="sr-only">{label} (nouvel onglet)</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           )}
         </div>
 
         <nav aria-label="Plan du site">
-          <p className="text-sm font-semibold tracking-[0.14em] text-gold uppercase">Le site</p>
-          <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 md:grid-cols-1">
+          <p className="text-xs font-bold tracking-[0.22em] text-gold uppercase">Le site</p>
+          <ul className="mt-4 grid grid-cols-2 gap-x-4 md:grid-cols-1">
             {mainNav.map((item) => (
               <li key={item.href}>
                 {/^https?:\/\//.test(item.href) ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener"
-                    className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline"
-                  >
+                  <a href={item.href} target="_blank" rel="noopener" className={link}>
                     {item.label}
                     <span className="sr-only"> (ouvre un autre site dans un nouvel onglet)</span>
                   </a>
                 ) : (
-                  <Link href={item.href} className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
+                  <Link href={item.href} className={link}>
                     {item.label}
                   </Link>
                 )}
@@ -119,44 +86,51 @@ export async function SiteFooter() {
         </nav>
 
         <div>
-          <p className="text-sm font-semibold tracking-[0.14em] text-gold uppercase">Informations</p>
-          <ul className="mt-4 space-y-1">
-            <li>
-              {settings.donationUrl ? (
-                <a
-                  href={settings.donationUrl}
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline"
-                >
-                  Faire un don
-                  <span className="sr-only"> (ouvre le site Allodons dans un nouvel onglet)</span>
+          <p className="text-xs font-bold tracking-[0.22em] text-gold uppercase">Contact</p>
+          <address className="mt-4 space-y-3 not-italic">
+            {settings.phone && (
+              <p className="flex gap-3">
+                <PhoneIcon aria-hidden weight="fill" className="mt-1 size-5 shrink-0 text-gold" />
+                <a href={telHref(settings.phone)} className="underline-offset-4 hover:text-white hover:underline">
+                  {settings.phone}
                 </a>
-              ) : (
-                <Link href="/faire-un-don" className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
-                  Faire un don
-                </Link>
-              )}
-            </li>
-            <li>
-              <Link href="/mentions-legales" className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
-                Mentions légales
-              </Link>
-            </li>
-            <li>
-              <Link href="/confidentialite" className="inline-block py-1.5 underline-offset-4 hover:text-white hover:underline">
-                Politique de confidentialité
-              </Link>
-            </li>
-            
-          </ul>
+              </p>
+            )}
+            {settings.email && (
+              <p className="flex gap-3">
+                <EnvelopeSimpleIcon aria-hidden weight="fill" className="mt-1 size-5 shrink-0 text-gold" />
+                <a href={`mailto:${settings.email}`} className="break-all underline-offset-4 hover:text-white hover:underline">
+                  {settings.email}
+                </a>
+              </p>
+            )}
+            <p className="flex gap-3">
+              <MapPinIcon aria-hidden weight="fill" className="mt-1 size-5 shrink-0 text-gold" />
+              <a href={directionsUrl(fullAddress)} target="_blank" rel="noopener" className="underline-offset-4 hover:text-white hover:underline">
+                {fullAddress}
+                <span className="sr-only"> (itinéraire, nouvel onglet)</span>
+              </a>
+            </p>
+          </address>
         </div>
       </div>
 
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-6xl px-4 py-5 text-sm text-white/65 sm:px-6">
-          © {settings.name}. Ce site n&apos;utilise aucun cookie de suivi.
-        </p>
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-5 pr-24 text-sm text-white/70 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:pr-28">
+          <p>© {settings.name}. Aucun cookie de suivi.</p>
+          <ul className="flex flex-wrap gap-x-5">
+            <li>
+              <Link href="/mentions-legales" className="inline-block py-2 underline-offset-4 hover:text-white hover:underline">
+                Mentions légales
+              </Link>
+            </li>
+            <li>
+              <Link href="/confidentialite" className="inline-block py-2 underline-offset-4 hover:text-white hover:underline">
+                Confidentialité
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
     </footer>
   );

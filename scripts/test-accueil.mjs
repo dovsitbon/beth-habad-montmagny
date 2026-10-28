@@ -3,8 +3,9 @@
  *   E2E_BASE_URL=https://… npm run test:accueil   (pour tester le site en ligne)
  *
  * L'horloge du navigateur est avancée au jeudi, vendredi et samedi qui viennent (heure de Paris) :
- * la page, servie depuis le cache, doit basculer seule entre « Offices de la semaine » et
- * « Horaires Chabbat », sans nouveau déploiement.
+ * la page, servie depuis le cache, doit basculer seule entre la carte « Aujourd'hui » et
+ * « Horaires Chabbat », sans nouveau déploiement. Le bandeau du haut (masqué sur l'accueil,
+ * où la carte le remplace) est vérifié sur la page Contact.
  */
 import { chromium } from "playwright-core";
 
@@ -53,25 +54,32 @@ async function homeAt(date) {
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
   await page.waitForTimeout(500);
   const text = await page.locator("main").innerText();
-  const first = await page.locator("main section").nth(1).innerText();
+  // Bloc principal : la carte « Aujourd'hui » ou les horaires de Chabbat en grand (après la bannière photo).
+  const first = await page.locator('main section[aria-labelledby="aujourdhui"], main section[aria-labelledby^="horaires-"]').first().innerText();
+  const homeBanner = await page.locator('section[aria-label="Offices du jour"], section[aria-label="Horaires de Chabbat"]').count();
+  await page.goto(`${BASE}/contact`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(300);
   const bar = page.locator('section[aria-label="Offices du jour"], section[aria-label="Horaires de Chabbat"]');
   const banner = (await bar.count()) ? { label: await bar.getAttribute("aria-label"), text: (await bar.innerText()).replace(/\s+/g, " ").trim(), href: await bar.locator("a").getAttribute("href") } : null;
   await context.close();
-  return { text, first, banner, errors };
+  return { text, first, banner, homeBanner, errors };
 }
 
 console.log(`\nAccueil (${BASE}) — semaine du ${thursday} au ${saturday}`);
 
 const jeudi = await homeAt(paris(thursday, "22:00"));
-check(`jeudi ${thursday} à 22h → « Offices de la semaine »`, jeudi.first.includes("Offices de la semaine") && !/HORAIRES CHABBAT/i.test(jeudi.first));
-check("jeudi : Chaharit 8h15 du lundi au vendredi, mis en évidence « Aujourd'hui »", /Du lundi au vendredi\s*Aujourd'hui[\s\S]*Chaharit\s*8h15/i.test(jeudi.first));
-check("jeudi : petit lien « Horaires de Chabbat »", jeudi.first.includes("Horaires de Chabbat"));
+const isToday = (r) => /AUJOURD'HUI/i.test(r.first) && /DEMAIN/i.test(r.first) && !/HORAIRES CHABBAT/i.test(r.first);
+check(`jeudi ${thursday} à 22h → carte « Aujourd'hui / Demain »`, isToday(jeudi), jeudi.first);
+check("jeudi 22h : « Demain : Chaharit à 8h15 »", /Demain\s*:\s*Chaharit à 8h15/i.test(jeudi.first));
+check("jeudi : ligne « Chabbat … Allumage … Fin … » vers /horaires", /Chabbat \S+.*\sAllumage avant \d+h\d*\s*·\s*Fin \d+h\d*/.test(jeudi.first.replace(/\s+/g, " ")));
+check("pas de bandeau d'horaires sur l'accueil (la carte le remplace)", jeudi.homeBanner === 0);
 
 const jeudiSoir = await homeAt(paris(thursday, "20:00"));
 check(`bandeau jeudi ${thursday} à 20h → offices du jour (« Aujourd'hui · Chaharit 8h15 … »)`, jeudiSoir.banner?.label === "Offices du jour" && /^Aujourd'hui · Chaharit 8h15/.test(jeudiSoir.banner.text));
 
 const vendrediMatin = await homeAt(paris(friday, "07:30"));
-check(`vendredi ${friday} à 7h30 → encore « Offices de la semaine » (bascule à 8h)`, vendrediMatin.first.includes("Offices de la semaine"));
+check(`vendredi ${friday} à 7h30 → encore la carte « Aujourd'hui » (bascule à 8h)`, isToday(vendrediMatin));
+check("vendredi 7h30 : prochain office Chaharit à 8h15, dans 45 min", /Prochain office\s*:\s*Chaharit à 8h15\s*dans 45 min/i.test(vendrediMatin.first));
 
 const vendrediBandeau = await homeAt(paris(friday, "09:00"));
 check(
@@ -82,12 +90,12 @@ check(
 );
 
 const vendredi = await homeAt(paris(friday, "10:00"));
-check(`vendredi ${friday} à 10h → « Horaires Chabbat » en grand`, /HORAIRES (CHABBAT|[A-Z' ]+)/.test(vendredi.first) && !vendredi.first.includes("Offices de la semaine"));
+check(`vendredi ${friday} à 10h → « Horaires Chabbat » en grand`, /HORAIRES (CHABBAT|[A-Z' ]+)/.test(vendredi.first) && !/Prochain office/.test(vendredi.first));
 check("vendredi : Allumage, Tania, Chaharit, Fin, Arvit et « Chabbat Chalom »", ["Allumage", "Tania", "Chaharit", "Fin", "Arvit", "Chabbat Chalom"].every((w) => vendredi.first.includes(w)));
 
 const samedi = await homeAt(paris(saturday, "23:00"));
-check(`samedi ${saturday} à 23h → « Offices de la semaine »`, samedi.first.includes("Offices de la semaine"));
-check("samedi soir : les offices de dimanche sont mis en avant (« Demain »)", /Dimanche\s*Demain[\s\S]*Chaharit\s*9h/i.test(samedi.first));
+check(`samedi ${saturday} à 23h → carte « Aujourd'hui / Demain »`, isToday(samedi));
+check("samedi soir : « Demain : Chaharit à 9h »", /Demain\s*:\s*Chaharit à 9h/i.test(samedi.first));
 check(`bandeau samedi ${saturday} à 23h → offices (« Demain · Chaharit 9h »)`, samedi.banner?.label === "Offices du jour" && samedi.banner.text.startsWith("Demain · Chaharit 9h"));
 
 // La page /horaires, elle, affiche les horaires de Chabbat toute la semaine.

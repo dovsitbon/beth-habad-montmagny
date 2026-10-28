@@ -1,7 +1,7 @@
 import Image, { type StaticImageData } from "next/image";
 
 /**
- * En-tête commun des pages intérieures (bandeau bleu avec filet doré).
+ * En-tête commun des pages intérieures : carte bleue très arrondie, détachée des bords.
  * Avec `image`, une photo discrète apparaît en fond sous un voile bleu :
  * 90 % côté texte (contraste AA garanti même sur une zone blanche de la photo),
  * qui s'éclaircit vers la droite sur grand écran, là où il n'y a pas de texte.
@@ -21,7 +21,8 @@ export function PageHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="relative isolate overflow-hidden bg-night text-white">
+    <div className="mx-3 mt-3 sm:mx-4">
+    <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-3xl bg-night text-white shadow-[var(--shadow-soft)]">
       {image && (
         <>
           <Image
@@ -31,7 +32,7 @@ export function PageHeader({
             priority
             fetchPriority="high"
             placeholder="blur"
-            sizes="100vw"
+            sizes="(min-width: 1152px) 1152px, 100vw"
             quality={60}
             className="-z-20 object-cover"
             style={{ objectPosition: imagePosition }}
@@ -42,12 +43,12 @@ export function PageHeader({
           />
         </>
       )}
-      <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gold" />
-      <div className="mx-auto max-w-6xl px-4 pt-10 pb-12 sm:px-6 sm:pt-14 sm:pb-16">
-        {eyebrow && <p className="text-sm font-semibold tracking-[0.18em] text-gold-soft uppercase">{eyebrow}</p>}
-        <h1 className="mt-3 max-w-3xl text-4xl font-semibold text-white sm:text-5xl">{title}</h1>
+      <div className="px-6 pt-10 pb-11 sm:px-10 sm:pt-14 sm:pb-16">
+        {eyebrow && <p className="text-xs font-bold tracking-[0.22em] text-gold-soft uppercase">{eyebrow}</p>}
+        <h1 className="mt-3 max-w-3xl text-4xl font-black text-white sm:text-5xl">{title}</h1>
         {children && <div className="mt-5 max-w-2xl text-lg text-white/90">{children}</div>}
       </div>
+    </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { MobileDonateBar } from "@/components/layout/mobile-donate-bar";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { OrganizationJsonLd } from "@/components/seo/organization-jsonld";
 
 export default function PublicLayout({ children }: LayoutProps<"/">) {
@@ -10,12 +10,12 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
       <OrganizationJsonLd />
       <SiteHeader />
       <AnnouncementBar />
-      {/* pb : place pour la barre Don fixe sur mobile */}
-      <main id="contenu" className="flex-1 pb-24 sm:pb-0">
+      {/* pb : place pour le bouton WhatsApp flottant au bas de la page */}
+      <main id="contenu" className="flex-1 pb-20 sm:pb-10">
         {children}
       </main>
       <SiteFooter />
-      <MobileDonateBar />
+      <WhatsAppFloat />
     </>
   );
 }

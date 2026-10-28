@@ -24,10 +24,13 @@ export async function AnnouncementBar() {
   }
 
   return (
-    <section aria-label="Annonces" className="border-b border-gold/40">
+    <section aria-label="Annonces" className="mx-auto mt-3 w-full max-w-6xl space-y-2 px-3 sm:px-4">
       {announcements.map((a) => (
-        <div key={a.id} className={a.level === "important" ? "bg-gold text-night-deep" : "bg-gold-tint text-ink"}>
-          <p className="mx-auto flex max-w-6xl items-start gap-3 px-4 py-3 sm:px-6">
+        <div
+          key={a.id}
+          className={`rounded-2xl ring-1 ${a.level === "important" ? "bg-gold text-night-deep ring-gold" : "bg-gold-tint text-ink ring-gold/40"}`}
+        >
+          <p className="flex items-start gap-3 px-4 py-3 sm:px-5">
             <MegaphoneSimpleIcon aria-hidden weight="fill" className="mt-0.5 size-5 shrink-0 text-night" />
             <span>
               <span className="font-semibold">{a.message}</span>

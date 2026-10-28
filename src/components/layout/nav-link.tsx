@@ -18,8 +18,8 @@ export function NavLink({
 
   const styles =
     variant === "bar"
-      ? "rounded-md px-2 py-2 text-[0.95rem] font-semibold whitespace-nowrap transition-colors hover:bg-night-tint hover:text-night aria-[current=page]:text-night aria-[current=page]:underline aria-[current=page]:decoration-gold aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-8"
-      : "flex min-h-12 items-center border-b border-line py-3 font-serif text-2xl text-ink aria-[current=page]:text-gold-ink";
+      ? "rounded-full px-3 py-2 text-[0.95rem] font-semibold whitespace-nowrap transition-colors hover:bg-night-tint hover:text-night aria-[current=page]:bg-night-tint aria-[current=page]:text-night"
+      : "flex min-h-14 items-center border-b border-line py-2 font-serif text-[1.75rem] font-black text-ink aria-[current=page]:text-gold-ink";
 
   if (/^https?:\/\//.test(href)) {
     return (
